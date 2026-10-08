@@ -136,7 +136,7 @@ jobs:
         run: |
           docker build -t spema:${{ github.sha }} -t spema:latest .
 
-      - name: 4. Container Security Check: Non-Root User Execution
+      - name: "4. Container Security Check: Non-Root User Execution"
         run: |
           CONTAINER_UID=$(docker run --rm spema:latest id -u)
           echo "Container User UID: $CONTAINER_UID"
@@ -145,7 +145,7 @@ jobs:
             exit 1
           fi
 
-      - name: 5. Container Security Check: Healthcheck Execution
+      - name: "5. Container Security Check: Healthcheck Execution"
         run: |
           CONTAINER_ID=$(docker run -d -p 8000:8000 -e SECRET_KEY="ci-container-verification-secret-key-32-chars-min" spema:latest)
           sleep 4
