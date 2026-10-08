@@ -70,6 +70,9 @@ def create_access_token(subject: int, expires_delta: Optional[timedelta] = None)
 
 def decode_access_token(token: str) -> Optional[Dict[str, Any]]:
     """Decodes and validates token signature and claims."""
+    if not token or not isinstance(token, str):
+        return None
+    token = token.strip()
     settings = get_settings()
     try:
         payload = jwt.decode(

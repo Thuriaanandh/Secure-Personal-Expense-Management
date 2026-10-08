@@ -45,6 +45,16 @@ def get_current_active_user(
     Extracts Bearer token from header or cookie; verifies signature, claims, and revocation.
     Derives user identity exclusively server-side.
     """
+    # Fallback if oauth2_scheme did not resolve token from non-standard header formats
+    if not token:
+        auth_header = request.headers.get("Authorization", "").strip()
+        if auth_header:
+            parts = auth_header.split(maxsplit=1)
+            if len(parts) == 2 and parts[0].lower() == "bearer":
+                token = parts[1].strip()
+            elif len(parts) == 1 and not parts[0].lower().startswith("bearer"):
+                token = parts[0].strip()
+
     # Fallback to cookie if authorization header is omitted (for web UI navigation)
     if not token and "access_token" in request.cookies:
         token = request.cookies.get("access_token")
@@ -55,6 +65,9 @@ def get_current_active_user(
             detail="Authentication token is required.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    # Robust sanitization: strip any leading or trailing whitespace
+    token = token.strip()
 
     user = auth_service.get_current_user_from_token(token)
     if not user:

@@ -63,6 +63,9 @@ class AuthService:
         return create_access_token(subject=user.id)
 
     def logout(self, user_id: int, token: str) -> bool:
+        if not token or not isinstance(token, str):
+            return False
+        token = token.strip()
         payload = decode_access_token(token)
         if not payload:
             return False
@@ -76,6 +79,9 @@ class AuthService:
         return True
 
     def get_current_user_from_token(self, token: str) -> Optional[User]:
+        if not token or not isinstance(token, str):
+            return None
+        token = token.strip()
         payload = decode_access_token(token)
         if not payload:
             return None
