@@ -44,14 +44,14 @@ def index(request: Request, user: Optional[User] = Depends(get_optional_web_user
 def login_page(request: Request, user: Optional[User] = Depends(get_optional_web_user)):
     if user:
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_302_FOUND)
-    return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="login.html")
 
 
 @router.get("/register", response_class=HTMLResponse)
 def register_page(request: Request, user: Optional[User] = Depends(get_optional_web_user)):
     if user:
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_302_FOUND)
-    return templates.TemplateResponse("register.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="register.html")
 
 
 @router.get("/dashboard", response_class=HTMLResponse)
@@ -72,9 +72,9 @@ def dashboard_page(
     recent_transactions, _ = txn_service.list_transactions(user_id=user.id, filters=filters)
 
     return templates.TemplateResponse(
-        "dashboard.html",
-        {
-            "request": request,
+        request=request,
+        name="dashboard.html",
+        context={
             "active_page": "dashboard",
             "user": user,
             "summary": summary,
@@ -106,9 +106,9 @@ def transactions_page(
     transactions, total_count = txn_service.list_transactions(user_id=user.id, filters=filters)
 
     return templates.TemplateResponse(
-        "transactions.html",
-        {
-            "request": request,
+        request=request,
+        name="transactions.html",
+        context={
             "active_page": "transactions",
             "user": user,
             "transactions": transactions,
@@ -135,6 +135,7 @@ def reports_page(
     categories = cat_service.list_categories(user_id=user.id)
 
     return templates.TemplateResponse(
-        "reports.html",
-        {"request": request, "active_page": "reports", "user": user, "categories": categories},
+        request=request,
+        name="reports.html",
+        context={"active_page": "reports", "user": user, "categories": categories},
     )

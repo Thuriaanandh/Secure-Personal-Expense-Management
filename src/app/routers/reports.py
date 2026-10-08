@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import StreamingResponse
 
 from src.app.core.dependencies import (
@@ -48,15 +48,18 @@ def export_csv_report(
     reporting_service: ReportingService = Depends(get_reporting_service),
     audit_service: AuditService = Depends(get_audit_service),
 ):
-    filters = TransactionFilterParams(
-        keyword=keyword,
-        category_id=category_id,
-        type=type,
-        start_date=start_date,
-        end_date=end_date,
-        skip=0,
-        limit=100,
-    )
+    try:
+        filters = TransactionFilterParams(
+            keyword=keyword,
+            category_id=category_id,
+            type=type,
+            start_date=start_date,
+            end_date=end_date,
+            skip=0,
+            limit=100,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
     csv_buffer = reporting_service.generate_csv_report(user_id=current_user.id, filters=filters)
 
@@ -90,15 +93,18 @@ def export_json_report(
     reporting_service: ReportingService = Depends(get_reporting_service),
     audit_service: AuditService = Depends(get_audit_service),
 ):
-    filters = TransactionFilterParams(
-        keyword=keyword,
-        category_id=category_id,
-        type=type,
-        start_date=start_date,
-        end_date=end_date,
-        skip=0,
-        limit=100,
-    )
+    try:
+        filters = TransactionFilterParams(
+            keyword=keyword,
+            category_id=category_id,
+            type=type,
+            start_date=start_date,
+            end_date=end_date,
+            skip=0,
+            limit=100,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
     data = reporting_service.generate_json_report(user_id=current_user.id, filters=filters)
 

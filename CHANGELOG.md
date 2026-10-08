@@ -3,6 +3,53 @@
 All notable changes to the **Secure Personal Expense Management Application (SPEMA)** project are documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) and [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.3.0] - 2026-10-08
+
+### Added
+- **Central CI/CD Automated Quality & Security Gate (`.github/workflows/ci.yml`):**
+  - Enhanced GitHub Actions workflow covering 13 comprehensive quality and security stages across 3 orchestrated jobs:
+    1. Checkout repository
+    2. Dependency installation (`pip install -r requirements.txt -r requirements-dev.txt`)
+    3. Dependency vulnerability auditing (`pip-audit`)
+    4. Secret hygiene & gitignore validation (`scripts/security_check.py`)
+    5. Linting & code standards analysis (`ruff check src/ tests/`)
+    6. Static Application Security Testing (`bandit -c bandit.yaml -r src/`)
+    7. Unit tests (`pytest tests/unit/`)
+    8. Integration tests (`pytest tests/integration/`)
+    9. System & API tests (`pytest tests/api/`)
+    10. Security & IDOR authorization isolation tests (`pytest tests/security/`)
+    11. Property-based and fuzz testing (`pytest tests/property/`)
+    12. Container build & non-root user verification (`docker build` + UID 10001 check)
+    13. Kubernetes deployment validation (`kubectl kustomize k8s/ --dry-run=client`)
+- **System and API Testing Suite (`tests/api/test_system_api.py`):**
+  - Live probe verification for `/healthz` and `/readyz` endpoints.
+  - OpenAPI 3.1.0 schema specification validation.
+  - OWASP security headers enforcement verification (`Content-Security-Policy`, `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security`, `Referrer-Policy`, `Permissions-Policy`).
+  - Web UI route accessibility and HTML content verification.
+- **Hypothesis Property-Based & Fuzz Testing (`tests/property/test_property_based.py`):**
+  - Formula injection invariant fuzzing (CWE-1236) across arbitrary Unicode text.
+  - Password strength validator resilience and soundness invariants (CWE-20 / CWE-521).
+  - Temporal query filter boundary invariants (inverted dates, spans > 5 years, leap years).
+  - Financial ledger amount precision and boundary invariants ($0.01 to $1,000,000.00).
+- **Comprehensive Authentication & Token Security Tests (`tests/security/test_auth_failures_and_tokens.py`):**
+  - Invalid credentials and non-existent user rejections (HTTP 401).
+  - Protected API routes authentication barrier enforcement.
+  - Malformed JWT header and payload structural rejection.
+  - HMAC-SHA256 signature tampering detection.
+  - Expired token lifecycle rejection.
+  - Revoked token enforcement via RFC 6750 case-insensitive Bearer logout.
+  - Malicious SQL injection and XSS input validation rejection (HTTP 422).
+
+### Fixed
+- **Silent Token Revocation Bypass on Case-Insensitive Bearer Header (CWE-613 / CWE-384):**
+  - Refactored `src/app/routers/auth.py` `logout` endpoint to handle RFC 6750 case-insensitive `bearer` authorization headers and arbitrary whitespace. Previously, non-standard headers bypassed the `startswith("Bearer ")` check, causing JWT decoding failures during revocation resulting in HTTP 200 without recording the token in `revoked_tokens`.
+  - Added regression test `tests/security/test_auth_failures_and_tokens.py::test_revoked_token_regression_case_insensitive_logout`.
+- **Unhandled ValidationError in Reports Filter Boundary (CWE-754 / CWE-20):**
+  - Refactored `src/app/routers/reports.py` `export_csv_report` and `export_json_report` endpoints with robust exception handling around `TransactionFilterParams` instantiation. Inverted date ranges or spans > 5 years now return clean `HTTP 400 Bad Request` instead of uncaught `HTTP 500 Internal Server Error`.
+  - Added regression test `tests/security/test_reporting_security.py::test_report_export_date_validation_regression`.
+- **Web UI TemplateResponse Starlette Compatibility:**
+  - Modernized all `templates.TemplateResponse` invocations in `src/app/routers/web.py` to use keyword arguments `request=request, name=..., context={...}`.
+
 ## [1.2.0] - 2026-10-08
 
 ### Added

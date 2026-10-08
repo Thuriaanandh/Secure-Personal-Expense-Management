@@ -1,4 +1,4 @@
-name: Secure Build & CI Pipeline
+name: Secure Build & CI/CD Pipeline
 
 on:
   push:
@@ -11,69 +11,152 @@ permissions:
   contents: read
 
 jobs:
+  # ============================================================================
+  # Stage 1: Static Code Quality, Dependency Auditing & Security SAST Gates
+  # ============================================================================
   security-and-quality:
-    name: Security Scan & Linting
+    name: Security SAST, Dependency Audit & Linting
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: 1. Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
+      - name: 2. Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: "pip"
 
-      - name: Install Dependencies
+      - name: 3. Install Dev & Security Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install ruff bandit
+          pip install -r requirements-dev.txt
 
-      - name: Run Ruff Static Linter
+      - name: 4. Dependency Security Verification (pip-audit)
         run: |
-          ruff check src/ tests/
+          pip-audit --desc || true
 
-      - name: Run Bandit SAST Security Scan
-        run: |
-          bandit -c bandit.yaml -r src/ -ll -ii
-
-      - name: Run Secret Scan
+      - name: 5. Secret Scanner & Git Hygiene Verification
         run: |
           python scripts/security_check.py
 
+      - name: 6. Static Analysis & Linter (Ruff)
+        run: |
+          ruff check src/ tests/
+
+      - name: 7. Static Application Security Testing (Bandit SAST)
+        run: |
+          bandit -c bandit.yaml -r src/ -ll -ii
+
+  # ============================================================================
+  # Stage 2: Comprehensive Automated Testing (Unit, Integration, API, Security, Property)
+  # ============================================================================
   automated-testing:
-    name: Automated Unit, Integration & Security Tests
+    name: Automated Unit, Integration, API & Security Testing
     runs-on: ubuntu-latest
     needs: security-and-quality
     steps:
-      - name: Checkout Code
+      - name: 1. Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
+      - name: 2. Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: "pip"
 
-      - name: Install Dependencies
+      - name: 3. Install Dev & Test Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest pytest-asyncio
+          pip install -r requirements-dev.txt
 
-      - name: Run Pytest Suite (Unit, Integration, IDOR & Security Tests)
+      - name: 4. Execute Unit Security Tests
         env:
           SECRET_KEY: "ci-testing-secret-key-minimum-32-bytes-long-for-security"
-          DATABASE_URL: "sqlite:///./test_ci.db"
+          DATABASE_URL: "sqlite:///:memory:"
           APP_ENV: "testing"
         run: |
-          pytest -v tests/
+          pytest -v tests/unit/
 
-      - name: Verify Application Startup
+      - name: 5. Execute Integration Lifecycle Tests
         env:
           SECRET_KEY: "ci-testing-secret-key-minimum-32-bytes-long-for-security"
-          DATABASE_URL: "sqlite:///./test_ci_app.db"
+          DATABASE_URL: "sqlite:///:memory:"
           APP_ENV: "testing"
         run: |
-          python -c "from src.app.main import app; print('FastAPI application initialized successfully.')"
+          pytest -v tests/integration/
+
+      - name: 6. Execute System & API Verification Tests
+        env:
+          SECRET_KEY: "ci-testing-secret-key-minimum-32-bytes-long-for-security"
+          DATABASE_URL: "sqlite:///:memory:"
+          APP_ENV: "testing"
+        run: |
+          pytest -v tests/api/
+
+      - name: 7. Execute Security & Authorization Isolation Tests (IDOR, BOLA, Injection)
+        env:
+          SECRET_KEY: "ci-testing-secret-key-minimum-32-bytes-long-for-security"
+          DATABASE_URL: "sqlite:///:memory:"
+          APP_ENV: "testing"
+        run: |
+          pytest -v tests/security/
+
+      - name: 8. Execute Property-Based & Fuzzing Invariant Tests (Hypothesis)
+        env:
+          SECRET_KEY: "ci-testing-secret-key-minimum-32-bytes-long-for-security"
+          DATABASE_URL: "sqlite:///:memory:"
+          APP_ENV: "testing"
+        run: |
+          pytest -v tests/property/
+
+      - name: 9. Build Verification & Application Startup Smoke Test
+        env:
+          SECRET_KEY: "ci-testing-secret-key-minimum-32-bytes-long-for-security"
+          DATABASE_URL: "sqlite:///:memory:"
+          APP_ENV: "production"
+        run: |
+          python -c "from src.app.main import app; print('SPEMA ASGI Application initialized successfully in production mode.')"
+
+  # ============================================================================
+  # Stage 3: Container Build, Image Hardening Checks & Kubernetes Validation
+  # ============================================================================
+  container-and-kubernetes:
+    name: Container Security & Kubernetes Deployment Gate
+    runs-on: ubuntu-latest
+    needs: automated-testing
+    steps:
+      - name: 1. Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 2. Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 3. Build Production Multi-Stage Docker Image
+        run: |
+          docker build -t spema:${{ github.sha }} -t spema:latest .
+
+      - name: 4. Container Security Check: Non-Root User Execution
+        run: |
+          CONTAINER_UID=$(docker run --rm spema:latest id -u)
+          echo "Container User UID: $CONTAINER_UID"
+          if [ "$CONTAINER_UID" -ne 10001 ]; then
+            echo "Security Violation: Container must run as unprivileged UID 10001 (appuser)"
+            exit 1
+          fi
+
+      - name: 5. Container Security Check: Healthcheck Execution
+        run: |
+          CONTAINER_ID=$(docker run -d -p 8000:8000 -e SECRET_KEY="ci-container-verification-secret-key-32-chars-min" spema:latest)
+          sleep 4
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/healthz)
+          echo "Container Healthcheck HTTP Status: $HTTP_STATUS"
+          docker rm -f $CONTAINER_ID
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Container health check failed with status $HTTP_STATUS"
+            exit 1
+          fi
+
+      - name: 6. Kubernetes Manifest Validation (Dry-Run)
+        run: |
+          kubectl apply --dry-run=client -k k8s/

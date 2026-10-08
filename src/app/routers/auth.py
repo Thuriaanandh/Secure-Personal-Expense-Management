@@ -149,10 +149,16 @@ def logout(
     auth_service: AuthService = Depends(get_auth_service),
     audit_service: AuditService = Depends(get_audit_service),
 ):
-    token = request.headers.get("Authorization")
-    if token and token.startswith("Bearer "):
-        token = token[7:]
-    elif "access_token" in request.cookies:
+    auth_header = request.headers.get("Authorization", "").strip()
+    token = None
+    if auth_header:
+        parts = auth_header.split(maxsplit=1)
+        if len(parts) == 2 and parts[0].lower() == "bearer":
+            token = parts[1].strip()
+        elif len(parts) == 1 and not parts[0].lower().startswith("bearer"):
+            token = parts[0].strip()
+
+    if not token and "access_token" in request.cookies:
         token = request.cookies.get("access_token")
 
     if token:

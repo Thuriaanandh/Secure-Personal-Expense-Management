@@ -4,9 +4,9 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Secure Personal Expense Management Application"
-    PROJECT_VERSION: str = "1.2.0"
+    PROJECT_VERSION: str = "1.3.0"
     APP_NAME: str = "Secure Personal Expense Management Application"
-    APP_VERSION: str = "1.2.0"
+    APP_VERSION: str = "1.3.0"
     APP_ENV: str = Field(default="development", alias="APP_ENV")
     CORS_ORIGINS: list[str] = ["http://localhost:8000", "http://127.0.0.1:8000"]
 

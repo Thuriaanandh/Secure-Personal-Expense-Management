@@ -96,3 +96,27 @@ def test_json_export_scopes_to_user_only(
     assert resp_a.status_code == 200
     items_a = resp_a.json()
     assert any(item["description"] == "UserAJsonAuditRecord" for item in items_a)
+
+
+def test_report_export_date_validation_regression(client: TestClient, auth_headers_user_a):
+    """
+    REGRESSION TEST FOR DEFECT 2:
+    Verify inverted date ranges (start_date > end_date) return HTTP 400 Bad Request
+    rather than unhandled HTTP 500 Internal Server Error.
+    """
+    # 1. Test CSV export with inverted date range
+    resp_csv = client.get(
+        "/api/v1/reports/export-csv?start_date=2026-12-31&end_date=2026-01-01",
+        headers=auth_headers_user_a,
+    )
+    assert resp_csv.status_code == 400
+    assert "start_date cannot be later than end_date" in resp_csv.json()["detail"]
+
+    # 2. Test JSON export with inverted date range
+    resp_json = client.get(
+        "/api/v1/reports/export-json?start_date=2026-12-31&end_date=2026-01-01",
+        headers=auth_headers_user_a,
+    )
+    assert resp_json.status_code == 400
+    assert "start_date cannot be later than end_date" in resp_json.json()["detail"]
+
