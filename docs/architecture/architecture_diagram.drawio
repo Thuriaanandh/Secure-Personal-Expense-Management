@@ -1,0 +1,88 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" agent="Antigravity" version="24.0.0">
+  <diagram id="Software_Architecture" name="Software Architecture">
+    <mxGraphModel dx="1500" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="layer_client" value="&lt;b&gt;PRESENTATION LAYER (Client &amp; UI)&lt;/b&gt; [Untrusted Trust Boundary]" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffebee;strokeColor=#d32f2f;strokeWidth=2;verticalAlign=top;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="40" y="40" width="1500" height="120" />
+        </mxCell>
+        <mxCell id="layer_api" value="&lt;b&gt;API ROUTING &amp; SECURITY GATEWAY LAYER&lt;/b&gt; [FastAPI / Middlewares]" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;strokeWidth=2;verticalAlign=top;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="40" y="200" width="1500" height="160" />
+        </mxCell>
+        <mxCell id="layer_service" value="&lt;b&gt;CORE DOMAIN &amp; BUSINESS SERVICE LAYER&lt;/b&gt; [Clean Architecture Services]" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#fbc02d;strokeWidth=2;verticalAlign=top;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="40" y="400" width="1500" height="180" />
+        </mxCell>
+        <mxCell id="layer_repo" value="&lt;b&gt;PERSISTENCE &amp; REPOSITORY LAYER&lt;/b&gt; [Tenant Scoped Data Access]" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#388e3c;strokeWidth=2;verticalAlign=top;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="40" y="620" width="1500" height="160" />
+        </mxCell>
+        <mxCell id="layer_db" value="&lt;b&gt;DATA STORAGE PERIMETER&lt;/b&gt; [Relational Database]" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;strokeWidth=2;verticalAlign=top;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="40" y="820" width="1500" height="120" />
+        </mxCell>
+        <mxCell id="c_browser" value="Web Browser Client&#10;(HTML5 / CSS / Vanilla JS)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="100" y="70" width="240" height="70" />
+        </mxCell>
+        <mxCell id="c_jinja" value="Jinja2 Server Templates&#10;(Context-Aware HTML Escaping)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="400" y="70" width="260" height="70" />
+        </mxCell>
+        <mxCell id="c_spa" value="REST API Consumer&#10;(HTTP Client / Fetch API)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="720" y="70" width="240" height="70" />
+        </mxCell>
+        <mxCell id="c_mw_sec" value="Security Headers &amp;&#10;CORS / Rate Limiting Middleware" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1e88e5;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="80" y="240" width="220" height="90" />
+        </mxCell>
+        <mxCell id="c_pydantic" value="Pydantic v2 DTO Validator&#10;(Whitelist Schema Layer)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1e88e5;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="340" y="240" width="220" height="90" />
+        </mxCell>
+        <mxCell id="c_di_auth" value="FastAPI Dependency Injection&#10;[Depends(get_current_active_user)]" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1e88e5;fontStyle=1;strokeWidth=2;" vertex="1">
+          <mxGeometry as_="geometry" x="600" y="240" width="260" height="90" />
+        </mxCell>
+        <mxCell id="c_routers" value="API Routers&#10;(/auth, /transactions, /reports)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1e88e5;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="900" y="240" width="220" height="90" />
+        </mxCell>
+        <mxCell id="c_err_handler" value="Global Exception Handler&#10;(Masks stack traces -&gt; generic 500)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1e88e5;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="1160" y="240" width="240" height="90" />
+        </mxCell>
+        <mxCell id="s_auth" value="AuthService&#10;(Argon2id + JWT Manager)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff59d;strokeColor=#fbc02d;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="80" y="440" width="220" height="100" />
+        </mxCell>
+        <mxCell id="s_txn" value="TransactionService&#10;(Enforces Business Logic &amp; Ownership)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff59d;strokeColor=#fbc02d;fontStyle=1;strokeWidth=2;" vertex="1">
+          <mxGeometry as_="geometry" x="340" y="440" width="260" height="100" />
+        </mxCell>
+        <mxCell id="s_cat" value="CategoryService&#10;(System + Custom Taxonomies)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff59d;strokeColor=#fbc02d;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="640" y="440" width="220" height="100" />
+        </mxCell>
+        <mxCell id="s_rep" value="ReportingService &amp;&#10;SecureCSVExporter (Formula Neutralizer)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff59d;strokeColor=#fbc02d;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="900" y="440" width="260" height="100" />
+        </mxCell>
+        <mxCell id="s_audit" value="AuditLogger&#10;(Masked Security Event Sink)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff59d;strokeColor=#fbc02d;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="1200" y="440" width="220" height="100" />
+        </mxCell>
+        <mxCell id="r_user" value="UserRepository&#10;(User &amp; Revoked Tokens)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#388e3c;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="80" y="660" width="220" height="80" />
+        </mxCell>
+        <mxCell id="r_txn" value="TransactionRepository&#10;(Compound user_id Scoped Queries)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#388e3c;fontStyle=1;strokeWidth=2;" vertex="1">
+          <mxGeometry as_="geometry" x="340" y="660" width="260" height="80" />
+        </mxCell>
+        <mxCell id="r_cat" value="CategoryRepository&#10;(System + User Categories)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#388e3c;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="640" y="660" width="220" height="80" />
+        </mxCell>
+        <mxCell id="r_audit" value="AuditRepository&#10;(Append-Only Security Log)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#388e3c;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="1200" y="660" width="220" height="80" />
+        </mxCell>
+        <mxCell id="db_engine" value="SQLAlchemy 2.0 Engine &amp; Connection Pool&#10;(Parameterized SQL / Foreign Key Enforcement)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#8e24aa;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="300" y="840" width="500" height="70" />
+        </mxCell>
+        <mxCell id="db_rdbms" value="Relational DB: SQLite (WAL) / PostgreSQL&#10;(ACID Compliant Data Persistence)" parent="1" style="shape=cylinder;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#8e24aa;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="900" y="830" width="260" height="90" />
+        </mxCell>
+        <mxCell id="arr_c_api" value="HTTPS / TLS 1.3 Requests" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d32f2f;strokeWidth=2;" edge="1" source="c_browser" target="c_mw_sec" />
+        <mxCell id="arr_api_srv" value="Validated DTO + Server-Derived Identity" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1976d2;strokeWidth=2;" edge="1" source="c_di_auth" target="s_txn" />
+        <mxCell id="arr_srv_repo" value="Tenant-Scoped Method Calls" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#fbc02d;strokeWidth=2;" edge="1" source="s_txn" target="r_txn" />
+        <mxCell id="arr_repo_db" value="Parameterized SQL Queries" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#388e3c;strokeWidth=2;" edge="1" source="r_txn" target="db_engine" />
+        <mxCell id="arr_eng_db" value="TCP / Unix Socket" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#7b1fa2;" edge="1" source="db_engine" target="db_rdbms" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

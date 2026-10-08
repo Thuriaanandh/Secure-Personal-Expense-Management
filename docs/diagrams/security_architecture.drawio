@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" agent="Antigravity" version="24.0.0">
+  <diagram id="Security_Architecture_View" name="Security Architecture View">
+    <mxGraphModel dx="1500" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="tb_client_sec" value="TRUST BOUNDARY 1 (TB1): Untrusted Browser Environment&#10;[Attacker controls DOM, local state, network traffic]" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;strokeColor=#d32f2f;strokeWidth=2;fillColor=#ffebee;verticalAlign=top;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="40" y="40" width="360" height="560" />
+        </mxCell>
+        <mxCell id="tb_app_sec" value="TRUST BOUNDARY 2 (TB2): Trusted Application Server Perimeter (FastAPI Backend)&#10;[Token cryptographic verification, zero client trust, tenant isolation, parameter sanitization]" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;strokeColor=#1976d2;strokeWidth=2;fillColor=#e3f2fd;verticalAlign=top;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="460" y="40" width="680" height="560" />
+        </mxCell>
+        <mxCell id="tb_db_sec" value="TRUST BOUNDARY 3 (TB3): Trusted Data Storage Perimeter (Database Engine)&#10;[ACID persistence, Foreign Key Cascades, compound index scans]" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;strokeColor=#388e3c;strokeWidth=2;fillColor=#e8f5e9;verticalAlign=top;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="1200" y="40" width="340" height="560" />
+        </mxCell>
+        <mxCell id="sec_user" value="Client HTTP Request&#10;Header: Authorization: Bearer &lt;jwt&gt;&#10;Tampered param: user_id=999&#10;[Ignored by Server]" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="80" y="160" width="280" height="90" />
+        </mxCell>
+        <mxCell id="sec_resp" value="Client UI Response&#10;HTTP 200/201 Success&#10;OR Uniform HTTP 404&#10;[Zero Info Leaks]" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="80" y="380" width="280" height="90" />
+        </mxCell>
+        <mxCell id="sec_gate1" value="Security Interceptor 1:&#10;JWT Cryptographic Verification&#10;(Validates HS256 signature, expiry, revoked JTI)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="500" y="100" width="280" height="80" />
+        </mxCell>
+        <mxCell id="sec_gate2" value="Security Interceptor 2:&#10;Identity Extractor &amp; Client ID Stripper&#10;(Discards client user_id -&gt; Binds current_user.id = U_101)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;strokeWidth=2;" vertex="1">
+          <mxGeometry as_="geometry" x="500" y="220" width="280" height="80" />
+        </mxCell>
+        <mxCell id="sec_gate3" value="Security Interceptor 3:&#10;Pydantic Whitelist Input Validator&#10;(Enforces amount &gt; 0.00, regex charsets)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="500" y="340" width="280" height="80" />
+        </mxCell>
+        <mxCell id="sec_gate4" value="Data Access Security Guard:&#10;Compound Query Builder&#10;WHERE id = :id AND user_id = :authenticated_user_id" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;strokeWidth=3;" vertex="1">
+          <mxGeometry as_="geometry" x="820" y="220" width="300" height="90" />
+        </mxCell>
+        <mxCell id="sec_gate5" value="Anti-Enumeration Guard:&#10;If row not found -&gt; HTTP 404 Not Found&#10;(Uniform response prevents ID probing)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="820" y="380" width="300" height="80" />
+        </mxCell>
+        <mxCell id="sec_db" value="Database Engine&#10;transactions Table&#10;Compound Index: (user_id, date)&#10;[Rows physically partitioned by user_id]" parent="1" style="shape=cylinder;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontStyle=1;strokeWidth=2;" vertex="1">
+          <mxGeometry as_="geometry" x="1240" y="220" width="260" height="120" />
+        </mxCell>
+        <mxCell id="sf1" value="1. Request crosses TB1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d32f2f;strokeWidth=2;" edge="1" source="sec_user" target="sec_gate1" />
+        <mxCell id="sf2" value="2. Token Validated" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1976d2;" edge="1" source="sec_gate1" target="sec_gate2" />
+        <mxCell id="sf3" value="3. Identity Bound" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1976d2;" edge="1" source="sec_gate2" target="sec_gate3" />
+        <mxCell id="sf4" value="4. Validated DTO + U_101" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1976d2;strokeWidth=2;" edge="1" source="sec_gate3" target="sec_gate4" />
+        <mxCell id="sf5" value="5. Compound Query crosses TB3" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#388e3c;strokeWidth=2;" edge="1" source="sec_gate4" target="sec_db" />
+        <mxCell id="sf6" value="6. Row returned (or None)" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#388e3c;" edge="1" source="sec_db" target="sec_gate5" />
+        <mxCell id="sf7" value="7. Safe Response crosses TB1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d32f2f;strokeWidth=2;" edge="1" source="sec_gate5" target="sec_resp" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
