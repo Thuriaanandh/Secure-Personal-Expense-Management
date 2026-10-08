@@ -6,7 +6,7 @@
 #>
 
 Write-Host "============================================================" -ForegroundColor Cyan
-Write-Host "SPEMA Secure Build Pipeline (v1.4.0 Baseline)" -ForegroundColor Cyan
+Write-Host "SPEMA Secure Build Pipeline (v1.5.0 Production Release)" -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
 
 # Step 1: Secret Scan & Git Hygiene

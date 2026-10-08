@@ -29,7 +29,7 @@ from src.app.main import app  # noqa: E402
 
 def verify_deployment():
     print("=" * 70)
-    print("SPEMA Secure Deployment Verification Audit (v1.4.0)")
+    print("SPEMA Secure Deployment Verification Audit (v1.5.0)")
     print("=" * 70)
 
     client = TestClient(app)

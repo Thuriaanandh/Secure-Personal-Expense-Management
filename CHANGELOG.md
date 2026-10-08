@@ -3,6 +3,16 @@
 All notable changes to the **Secure Personal Expense Management Application (SPEMA)** project are documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) and [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.5.0] - 2026-10-08
+
+### Added
+- **Final Security Review & Complete SSDLC Traceability Audit (`docs/final/final-security-review.md`):**
+  - Exhaustive 20-domain technical security review verifying end-to-end implementation and negative testing controls.
+  - Complete 13-stage bidirectional traceability matrix mapping: Requirements $\rightarrow$ Use Cases $\rightarrow$ Data Models $\rightarrow$ DFDs $\rightarrow$ STRIDE Threats $\rightarrow$ Vulnerabilities $\rightarrow$ Attack Trees $\rightarrow$ User Stories $\rightarrow$ Sprint Tasks $\rightarrow$ Source Code $\rightarrow$ Tests $\rightarrow$ CI/CD $\rightarrow$ Deployment Controls. Zero broken links.
+  - Residual risk analysis detailing the three highest-risk operational considerations and architecture-level mitigations.
+  - Formal documentation of two architectural project limitations (single-pod SQLite concurrency boundary and in-memory audit buffer persistence window).
+  - Production release certification following 100% green verification on remote GitHub Actions CI/CD pipeline.
+
 ## [1.4.0] - 2026-10-08
 
 ### Added

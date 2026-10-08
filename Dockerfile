@@ -39,7 +39,7 @@ FROM python:3.12-slim-bookworm AS runner
 # Metadata
 LABEL maintainer="Secure Software Engineering Team <security@spema.local>" \
       description="Production image for Secure Personal Expense Management Application" \
-      version="1.4.0" \
+      version="1.5.0" \
       security.scanned="true"
 
 # Runtime Environment Variables
