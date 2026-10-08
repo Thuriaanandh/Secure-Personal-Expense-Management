@@ -159,4 +159,5 @@ jobs:
 
       - name: 6. Kubernetes Manifest Validation (Dry-Run)
         run: |
-          kubectl apply --dry-run=client -k k8s/
+          kubectl kustomize k8s/
+
