@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" agent="Antigravity" version="24.0.0">
+  <diagram id="Relational_ER_Diagram" name="Relational ER Diagram">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ent_user" value="&lt;b&gt;USERS (Entity)&lt;/b&gt;&lt;br&gt;------------------------------------&lt;br&gt;&lt;b&gt;PK id&lt;/b&gt;: BIGINT AUTOINCREMENT&lt;br&gt;uuid: VARCHAR(36) UNIQUE NOT NULL&lt;br&gt;email: VARCHAR(255) UNIQUE NOT NULL&lt;br&gt;username: VARCHAR(50) UNIQUE NOT NULL&lt;br&gt;password_hash: VARCHAR(255) NOT NULL&lt;br&gt;is_active: BOOLEAN NOT NULL DEFAULT TRUE&lt;br&gt;created_at: TIMESTAMP WITH TIME ZONE&lt;br&gt;updated_at: TIMESTAMP WITH TIME ZONE" parent="1" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#e1f5fe;strokeColor=#0288d1;" vertex="1">
+          <mxGeometry as_="geometry" x="40" y="80" width="300" height="200" />
+        </mxCell>
+        <mxCell id="ent_token" value="&lt;b&gt;REVOKED_TOKENS (Entity)&lt;/b&gt;&lt;br&gt;------------------------------------&lt;br&gt;&lt;b&gt;PK id&lt;/b&gt;: BIGINT AUTOINCREMENT&lt;br&gt;&lt;b&gt;FK user_id&lt;/b&gt;: BIGINT NOT NULL&lt;br&gt;jti: VARCHAR(36) UNIQUE NOT NULL&lt;br&gt;revoked_at: TIMESTAMP WITH TIME ZONE&lt;br&gt;expires_at: TIMESTAMP WITH TIME ZONE" parent="1" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#ffebee;strokeColor=#e53935;" vertex="1">
+          <mxGeometry as_="geometry" x="40" y="380" width="300" height="140" />
+        </mxCell>
+        <mxCell id="ent_cat" value="&lt;b&gt;CATEGORIES (Entity)&lt;/b&gt;&lt;br&gt;------------------------------------&lt;br&gt;&lt;b&gt;PK id&lt;/b&gt;: BIGINT AUTOINCREMENT&lt;br&gt;&lt;b&gt;FK user_id&lt;/b&gt;: BIGINT NULLABLE&lt;br&gt;name: VARCHAR(50) NOT NULL&lt;br&gt;type: VARCHAR(10) NOT NULL [INCOME/EXPENSE]&lt;br&gt;is_system: BOOLEAN NOT NULL DEFAULT FALSE&lt;br&gt;created_at: TIMESTAMP WITH TIME ZONE&lt;br&gt;&lt;i&gt;CONSTRAINT: UNIQUE(user_id, name)&lt;/i&gt;" parent="1" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#e8f5e9;strokeColor=#388e3c;" vertex="1">
+          <mxGeometry as_="geometry" x="520" y="80" width="340" height="180" />
+        </mxCell>
+        <mxCell id="ent_txn" value="&lt;b&gt;TRANSACTIONS (Entity)&lt;/b&gt;&lt;br&gt;------------------------------------&lt;br&gt;&lt;b&gt;PK id&lt;/b&gt;: BIGINT AUTOINCREMENT&lt;br&gt;&lt;b&gt;FK user_id&lt;/b&gt;: BIGINT NOT NULL [OWNERSHIP]&lt;br&gt;&lt;b&gt;FK category_id&lt;/b&gt;: BIGINT NOT NULL&lt;br&gt;amount: NUMERIC(12,2) NOT NULL [&gt;0.00]&lt;br&gt;type: VARCHAR(10) NOT NULL [INCOME/EXPENSE]&lt;br&gt;transaction_date: DATE NOT NULL&lt;br&gt;description: VARCHAR(255) NULLABLE&lt;br&gt;created_at: TIMESTAMP WITH TIME ZONE&lt;br&gt;updated_at: TIMESTAMP WITH TIME ZONE&lt;br&gt;&lt;i&gt;INDEXES: (user_id, date), (user_id, cat)&lt;/i&gt;" parent="1" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#fff9c4;strokeColor=#fbc02d;strokeWidth=2;" vertex="1">
+          <mxGeometry as_="geometry" x="520" y="360" width="340" height="240" />
+        </mxCell>
+        <mxCell id="ent_audit" value="&lt;b&gt;AUDIT_LOGS (Entity)&lt;/b&gt;&lt;br&gt;------------------------------------&lt;br&gt;&lt;b&gt;PK id&lt;/b&gt;: BIGINT AUTOINCREMENT&lt;br&gt;timestamp: TIMESTAMP WITH TIME ZONE NOT NULL&lt;br&gt;event_type: VARCHAR(50) NOT NULL&lt;br&gt;&lt;b&gt;FK user_id&lt;/b&gt;: BIGINT NULLABLE&lt;br&gt;client_ip: VARCHAR(45) NOT NULL&lt;br&gt;user_agent: VARCHAR(255) NULLABLE&lt;br&gt;resource: VARCHAR(100) NOT NULL&lt;br&gt;status_code: INTEGER NOT NULL&lt;br&gt;details: TEXT NULLABLE [NO CREDENTIALS]&lt;br&gt;&lt;i&gt;INDEXES: (timestamp), (user_id, timestamp)&lt;/i&gt;" parent="1" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#f3e5f5;strokeColor=#8e24aa;" vertex="1">
+          <mxGeometry as_="geometry" x="980" y="160" width="340" height="240" />
+        </mxCell>
+        <mxCell id="rel_u_t" value="1 : N (Owns strictly)" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#0288d1;entryX=0;entryY=0.5;exitX=0.5;exitY=1;" edge="1" source="ent_user" target="ent_txn" />
+        <mxCell id="rel_u_cat" value="1 : N (Defines custom, opt)" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1;strokeColor=#0288d1;exitX=1;exitY=0.3;entryX=0;entryY=0.3;" edge="1" source="ent_user" target="ent_cat" />
+        <mxCell id="rel_cat_txn" value="1 : N (Categorizes)" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1;strokeColor=#388e3c;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" source="ent_cat" target="ent_txn" />
+        <mxCell id="rel_u_tok" value="1 : N (Revoked tokens)" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1;strokeColor=#e53935;exitX=0.2;exitY=1;entryX=0.2;entryY=0;" edge="1" source="ent_user" target="ent_token" />
+        <mxCell id="rel_u_aud" value="1 : N (Generates, opt)" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1;strokeColor=#8e24aa;exitX=1;exitY=0.7;entryX=0;entryY=0.3;" edge="1" source="ent_user" target="ent_audit" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

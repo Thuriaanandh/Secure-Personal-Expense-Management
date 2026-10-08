@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" agent="Antigravity" version="24.0.0">
+  <diagram id="DFD_Level_2_Authorization_Gate" name="DFD Level 2 Authorization Gate">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="tb_client" value="Untrusted Browser / User-Agent" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;strokeColor=#e53935;strokeWidth=2;fillColor=#ffebee;verticalAlign=top;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="40" y="40" width="240" height="560" />
+        </mxCell>
+        <mxCell id="tb_app" value="Trusted Application Server Boundary" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;strokeColor=#1e88e5;strokeWidth=2;fillColor=#e3f2fd;verticalAlign=top;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="340" y="40" width="720" height="560" />
+        </mxCell>
+        <mxCell id="tb_db" value="Trusted Database Boundary" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;strokeColor=#388e3c;strokeWidth=2;fillColor=#e8f5e9;verticalAlign=top;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="1120" y="40" width="280" height="560" />
+        </mxCell>
+        <mxCell id="actor_user" value="User Browser&#10;(Sends HTTP Request)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="70" y="200" width="180" height="80" />
+        </mxCell>
+        <mxCell id="p2_1" value="2.1 Token Validation&#10;&amp; Identity Extraction&#10;[Inspects JWT signature &amp; claims]" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="380" y="80" width="180" height="90" />
+        </mxCell>
+        <mxCell id="p2_2" value="2.2 Client-ID Strip &amp;&#10;Parameter Sanitizer&#10;[Discards client user_id]" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="380" y="220" width="180" height="90" />
+        </mxCell>
+        <mxCell id="p2_3" value="2.3 Schema Validation&#10;[Pydantic v2: amount &gt; 0]" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="380" y="360" width="180" height="90" />
+        </mxCell>
+        <mxCell id="p3_1" value="3.1 Compound ORM&#10;Query Builder&#10;[Enforces user_id == token.sub]" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;strokeWidth=2;" vertex="1">
+          <mxGeometry as_="geometry" x="680" y="220" width="200" height="90" />
+        </mxCell>
+        <mxCell id="p3_2" value="3.2 Anti-Enumeration&#10;Response Formatter&#10;[Uniform 404 for missing/foreign ID]" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="680" y="380" width="200" height="90" />
+        </mxCell>
+        <mxCell id="d_txn" value="D3: Transaction Ledger&#10;[transactions table]" parent="1" style="shape=partialRectangle;top=0;bottom=0;fillColor=#c8e6c9;strokeColor=#2e7d32;fontStyle=1;strokeWidth=2;" vertex="1">
+          <mxGeometry as_="geometry" x="1150" y="220" width="220" height="90" />
+        </mxCell>
+        <mxCell id="e1" value="HTTP Request + Bearer Token" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="actor_user" target="p2_1" />
+        <mxCell id="e2" value="Verified claims (user_id=U_101)" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="p2_1" target="p2_2" />
+        <mxCell id="e3" value="Raw Payload Data" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="p2_2" target="p2_3" />
+        <mxCell id="e4" value="Validated DTO + Server-Enforced U_101" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#1976d2;" edge="1" source="p2_3" target="p3_1" />
+        <mxCell id="e5" value="WHERE id = :id AND user_id = :U_101" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#2e7d32;" edge="1" source="p3_1" target="d_txn" />
+        <mxCell id="e6" value="Query Result (Row or None)" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="d_txn" target="p3_2" />
+        <mxCell id="e7" value="HTTP 200 / 201 (or 404 Not Found)" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="p3_2" target="actor_user" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

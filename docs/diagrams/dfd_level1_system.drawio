@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" agent="Antigravity" version="24.0.0">
+  <diagram id="DFD_Level_1_System_Architecture" name="DFD Level 1 System Architecture">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="tb_untrusted" value="TB1: Untrusted Client Boundary (Browser)" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;strokeColor=#e53935;strokeWidth=2;fillColor=#ffebee;verticalAlign=top;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="40" y="40" width="260" height="800" />
+        </mxCell>
+        <mxCell id="tb_app" value="TB2: Trusted Application Execution Environment (FastAPI Backend)" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;strokeColor=#1e88e5;strokeWidth=2;fillColor=#e3f2fd;verticalAlign=top;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="360" y="40" width="680" height="800" />
+        </mxCell>
+        <mxCell id="tb_db" value="TB3: Trusted Data Store Security Perimeter (Database)" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;strokeColor=#388e3c;strokeWidth=2;fillColor=#e8f5e9;verticalAlign=top;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="1100" y="40" width="360" height="800" />
+        </mxCell>
+        <mxCell id="user_ext" value="Authenticated User&#10;(Client Browser)" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="80" y="360" width="180" height="100" />
+        </mxCell>
+        <mxCell id="p1" value="1.0 Authentication &amp;&#10;Session Service&#10;[Argon2id / JWT]" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="420" y="80" width="180" height="90" />
+        </mxCell>
+        <mxCell id="p2" value="2.0 Authorization &amp;&#10;Tenancy Gate&#10;[Identity Extraction]" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;strokeWidth=2;" vertex="1">
+          <mxGeometry as_="geometry" x="420" y="240" width="180" height="90" />
+        </mxCell>
+        <mxCell id="p3" value="3.0 Transaction&#10;Management&#10;[Income / Expense CRUD]" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="420" y="400" width="180" height="90" />
+        </mxCell>
+        <mxCell id="p4" value="4.0 Financial Analysis&#10;&amp; Monthly Summary&#10;[Aggregations]" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="420" y="540" width="180" height="90" />
+        </mxCell>
+        <mxCell id="p5" value="5.0 Secure Report&#10;Generation&#10;[Formula Neutralization]" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="420" y="680" width="180" height="90" />
+        </mxCell>
+        <mxCell id="p6" value="6.0 Security Audit&#10;Logger&#10;[Masked Audit Events]" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe082;strokeColor=#ffa000;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="760" y="380" width="180" height="90" />
+        </mxCell>
+        <mxCell id="d1" value="D1: User &amp; Credential Store&#10;(users, revoked_tokens)" parent="1" style="shape=partialRectangle;top=0;bottom=0;fillColor=#c8e6c9;strokeColor=#2e7d32;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="1140" y="80" width="240" height="80" />
+        </mxCell>
+        <mxCell id="d2" value="D2: Category Store&#10;(categories)" parent="1" style="shape=partialRectangle;top=0;bottom=0;fillColor=#c8e6c9;strokeColor=#2e7d32;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="1140" y="240" width="240" height="80" />
+        </mxCell>
+        <mxCell id="d3" value="D3: Transaction Ledger&#10;(transactions)" parent="1" style="shape=partialRectangle;top=0;bottom=0;fillColor=#c8e6c9;strokeColor=#2e7d32;fontStyle=1;strokeWidth=2;" vertex="1">
+          <mxGeometry as_="geometry" x="1140" y="440" width="240" height="100" />
+        </mxCell>
+        <mxCell id="d4" value="D4: Security Audit Store&#10;(audit_logs)" parent="1" style="shape=partialRectangle;top=0;bottom=0;fillColor=#c8e6c9;strokeColor=#2e7d32;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="1140" y="660" width="240" height="80" />
+        </mxCell>
+        <mxCell id="fl_auth" value="Credentials&#10;[HTTPS]" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="user_ext" target="p1" />
+        <mxCell id="fl_token" value="JWT Token&#10;[HS256]" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="p1" target="user_ext" />
+        <mxCell id="fl_req" value="Request + Bearer Token&#10;(zero trusted client IDs)" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#d32f2f;" edge="1" source="user_ext" target="p2" />
+        <mxCell id="fl_gate" value="Verified Caller Identity&#10;(current_user.id)" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#1976d2;" edge="1" source="p2" target="p3" />
+        <mxCell id="fl_gate4" value="Scoped user_id" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="p2" target="p4" />
+        <mxCell id="fl_gate5" value="Scoped user_id" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="p2" target="p5" />
+        <mxCell id="fl_txn_db" value="Compound Query:&#10;WHERE user_id = :uid&#10;AND id = :id" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#2e7d32;" edge="1" source="p3" target="d3" />
+        <mxCell id="fl_cat_db" value="Query Categories&#10;(system OR user_id = :uid)" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="p3" target="d2" />
+        <mxCell id="fl_sum_db" value="Aggregate query&#10;(WHERE user_id = :uid)" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="p4" target="d3" />
+        <mxCell id="fl_rep_db" value="Fetch records&#10;(WHERE user_id = :uid)" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="p5" target="d3" />
+        <mxCell id="fl_audit" value="Security Event&#10;(AuditLogEntry)" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="p2" target="p6" />
+        <mxCell id="fl_audit_log" value="Append Audit Log" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="p6" target="d4" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
