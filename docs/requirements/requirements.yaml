@@ -1,0 +1,323 @@
+version: "1.0.0"
+project: "Secure Personal Expense Management Application"
+project_code: "SPEMA"
+classification: "Confidential - SSDLC Baseline"
+
+stakeholders:
+  - id: STK-01
+    name: "Account Owner (End User)"
+    description: "Individual user managing personal finances"
+  - id: STK-02
+    name: "Security Auditor / Examiner"
+    description: "Evaluator verifying SSDLC artifacts, threat models, and negative tests"
+  - id: STK-03
+    name: "DevOps / System Administrator"
+    description: "Operator managing container deployment and infrastructure"
+  - id: STK-04
+    name: "Application Developer"
+    description: "Engineering team implementing code under Rugged Scrum and XP"
+
+user_types:
+  - id: USR-01
+    type: "Anonymous / Unauthenticated Visitor"
+    allowed_endpoints: ["/auth/register", "/auth/login"]
+  - id: USR-02
+    type: "Authenticated Account Owner"
+    allowed_endpoints: ["/transactions/*", "/categories/*", "/summaries/*", "/reports/*", "/profile/*"]
+    tenancy_policy: "Strict single-tenant access scoped to token identity"
+  - id: USR-03
+    type: "System Administrator"
+    allowed_endpoints: ["/healthz", "/readyz"]
+    tenancy_policy: "Zero-Trust: No direct access to transaction data"
+
+assets:
+  - id: AST-01
+    name: "User Credentials"
+    confidentiality: "Critical"
+    integrity: "Critical"
+    availability: "High"
+  - id: AST-02
+    name: "Session Tokens"
+    confidentiality: "Critical"
+    integrity: "Critical"
+    availability: "High"
+  - id: AST-03
+    name: "Transaction Records"
+    confidentiality: "High"
+    integrity: "High"
+    availability: "High"
+  - id: AST-04
+    name: "Financial Summaries & Reports"
+    confidentiality: "High"
+    integrity: "High"
+    availability: "Medium"
+  - id: AST-05
+    name: "Audit & Security Logs"
+    confidentiality: "Medium"
+    integrity: "Critical"
+    availability: "High"
+  - id: AST-06
+    name: "Application Secrets"
+    confidentiality: "Critical"
+    integrity: "Critical"
+    availability: "Critical"
+  - id: AST-07
+    name: "PII (User Profile)"
+    confidentiality: "High"
+    integrity: "High"
+    availability: "High"
+
+functional_requirements:
+  - id: FR-001
+    name: "User Registration"
+    description: "Allows unauthenticated users to create an account with email, username, and password."
+    priority: "Must"
+    risk: "Medium"
+  - id: FR-002
+    name: "User Authentication"
+    description: "Authenticates users via Argon2id password hash check and issues signed JWT access token."
+    priority: "Must"
+    risk: "High"
+  - id: FR-003
+    name: "User Logout"
+    description: "Terminates active user session and discards client-side token credentials."
+    priority: "Must"
+    risk: "Medium"
+  - id: FR-004
+    name: "Record Income Transaction"
+    description: "Creates an income entry with positive amount, date, category, and optional notes."
+    priority: "Must"
+    risk: "Medium"
+  - id: FR-005
+    name: "Record Expense Transaction"
+    description: "Creates an expense entry with positive amount, date, category, and optional notes."
+    priority: "Must"
+    risk: "Medium"
+  - id: FR-006
+    name: "Transaction Categorization"
+    description: "Allows transactions to be mapped to predefined or custom financial categories."
+    priority: "Must"
+    risk: "Low"
+  - id: FR-007
+    name: "Monthly Financial Summaries"
+    description: "Aggregates total income, expenses, net savings, and category breakdown per month."
+    priority: "Must"
+    risk: "High"
+  - id: FR-008
+    name: "Search and Filter Transactions"
+    description: "Enables multi-criteria query across keywords, date ranges, categories, and amounts."
+    priority: "Must"
+    risk: "Medium"
+  - id: FR-009
+    name: "Transaction Mutation and Deletion"
+    description: "Allows updates and deletions of existing transactions subject to strict ownership checks."
+    priority: "Must"
+    risk: "Critical"
+  - id: FR-010
+    name: "Financial Report Generation"
+    description: "Exports filtered or periodic financial statements to downloadable CSV files."
+    priority: "Must"
+    risk: "High"
+  - id: FR-011
+    name: "Account Profile Management"
+    description: "Permits user to inspect profile and perform verified password changes."
+    priority: "Should"
+    risk: "Medium"
+  - id: FR-012
+    name: "System Liveness and Readiness"
+    description: "Exposes health check endpoints for Kubernetes orchestration monitoring."
+    priority: "Must"
+    risk: "Low"
+
+non_functional_requirements:
+  - id: NFR-001
+    category: "Performance"
+    description: "API endpoints respond within 200ms under 50 concurrent requests."
+    priority: "Should"
+  - id: NFR-002
+    category: "Scalability & Resource"
+    description: "Container stays within 256MB RAM and 0.5 CPU under baseline operation."
+    priority: "Must"
+  - id: NFR-003
+    category: "Data Integrity"
+    description: "Financial transactions adhere to ACID properties; fixed-point decimal arithmetic."
+    priority: "Must"
+  - id: NFR-004
+    category: "Usability & Feedback"
+    description: "Clear feedback without leaking technical stack traces or database errors."
+    priority: "Must"
+  - id: NFR-005
+    category: "Maintainability"
+    description: "PEP 8 compliance, full type hinting, and minimum 85% test coverage."
+    priority: "Must"
+  - id: NFR-006
+    category: "Portability"
+    description: "OCI-compliant Docker packaging runnable on Minikube and Kubernetes."
+    priority: "Must"
+  - id: NFR-007
+    category: "Secret Hygiene"
+    description: "Zero hardcoded passwords, keys, or secrets across git repository and images."
+    priority: "Must"
+
+security_requirements:
+  - id: SEC-001
+    category: "Authentication"
+    name: "Password Hashing"
+    requirement: "Hash passwords with Argon2id or bcrypt (work factor 12) with per-user salt."
+    rationale: "Prevents offline credential recovery if database is compromised."
+    priority: "Must"
+    verification_method: "Cryptographic hash algorithm validation unit test"
+    risk: "Critical"
+
+  - id: SEC-002
+    category: "Authentication"
+    name: "Password Policy"
+    requirement: "Enforce minimum 10 characters with upper, lower, digit, and symbol."
+    rationale: "Mitigates dictionary attacks and weak credential adoption."
+    priority: "Must"
+    verification_method: "Negative registration unit test suite"
+    risk: "Medium"
+
+  - id: SEC-003
+    category: "Authentication"
+    name: "Rate Limiting & Brute Force Defense"
+    requirement: "Limit auth attempts to at most 5 attempts per 15 minutes per IP/username."
+    rationale: "Thwarts automated credential stuffing and password brute forcing."
+    priority: "Must"
+    verification_method: "Automated rate limiter burst test"
+    risk: "High"
+
+  - id: SEC-004
+    category: "Authentication"
+    name: "Session Token Security"
+    requirement: "Issue HMAC-SHA256 signed JWTs with max 30-min expiration; validate claims strictly."
+    rationale: "Prevents session tampering, token forgery, and replay attacks."
+    priority: "Must"
+    verification_method: "JWT tampering and expiry verification test"
+    risk: "Critical"
+
+  - id: SEC-005
+    category: "Authorization"
+    name: "Server-Side Multi-Tenant Isolation (Primary Mandate)"
+    requirement: "An authenticated user must NEVER access, modify, search, aggregate, or report on another user's financial records. Identity derived strictly from session token; client user_id rejected."
+    rationale: "Absolute elimination of Broken Object-Level Authorization (BOLA / IDOR / OWASP API1:2023)."
+    priority: "Must"
+    verification_method: "Automated negative multi-user cross-tenant test suite (asserting HTTP 404)"
+    risk: "Critical"
+
+  - id: SEC-006
+    category: "Authorization"
+    name: "Anti-Enumeration Error Handling"
+    requirement: "Cross-tenant and non-existent resource requests must return identical HTTP 404 responses."
+    rationale: "Prevents attackers from enumerating valid transaction IDs via 403 vs 404 discrepancies."
+    priority: "Must"
+    verification_method: "Automated timing and response comparison test"
+    risk: "High"
+
+  - id: SEC-007
+    category: "Authorization"
+    name: "Parameter Pollution Defense"
+    requirement: "Client-supplied user_id or conflicting tenant parameters must be discarded or rejected."
+    rationale: "Stops parameter tampering attacks attempting to confuse backend routing."
+    priority: "Must"
+    verification_method: "Negative API test injecting conflicting user_id query parameters"
+    risk: "High"
+
+  - id: SEC-008
+    category: "Input Validation"
+    name: "Strict Whitelist Validation"
+    requirement: "All inputs validated with Pydantic v2 schemas; strict positive amount boundaries."
+    rationale: "Blocks malformed data, unexpected types, and financial balance distortion."
+    priority: "Must"
+    verification_method: "Pydantic boundary fuzz testing"
+    risk: "High"
+
+  - id: SEC-009
+    category: "Injection Defense"
+    name: "SQL Injection Prevention"
+    requirement: "Use SQLAlchemy ORM parameterized queries exclusively; no raw string interpolation."
+    rationale: "Complete defense against SQL Injection (CWE-89 / OWASP A03:2021)."
+    priority: "Must"
+    verification_method: "Bandit SAST scan and automated SQLi payload fuzzing"
+    risk: "Critical"
+
+  - id: SEC-010
+    category: "Output Encoding"
+    name: "XSS Prevention & CSP"
+    requirement: "Context-aware HTML encoding of user inputs; deploy strict Content-Security-Policy."
+    rationale: "Prevents Stored and Reflected Cross-Site Scripting (XSS / CWE-79)."
+    priority: "Must"
+    verification_method: "Automated XSS payload test and CSP header verification"
+    risk: "High"
+
+  - id: SEC-011
+    category: "Secure Reporting"
+    name: "CSV Formula Injection Neutralization"
+    requirement: "Neutralize spreadsheet formula triggers (=, +, -, @) by prepending single quote."
+    rationale: "Eliminates CWE-1236 spreadsheet execution attacks when opening CSV exports."
+    priority: "Must"
+    verification_method: "Automated CSV export verification with formula payloads"
+    risk: "High"
+
+  - id: SEC-012
+    category: "Secure Reporting"
+    name: "Tenant-Scoped Report Generation"
+    requirement: "Reports must enforce strict current_user.id scoping across all export queries."
+    rationale: "Prevents report export endpoints from acting as a backdoor for bulk tenant leakage."
+    priority: "Must"
+    verification_method: "Multi-tenant export verification test"
+    risk: "Critical"
+
+  - id: SEC-013
+    category: "Confidentiality"
+    name: "Transport Layer Security"
+    requirement: "Enforce TLS 1.3 / HTTPS with HSTS headers across all endpoints."
+    rationale: "Protects sensitive financial data and tokens from interception in transit."
+    priority: "Must"
+    verification_method: "Security header inspection test"
+    risk: "High"
+
+  - id: SEC-014
+    category: "Confidentiality"
+    name: "Secret Zeroization"
+    requirement: "Load all secrets from runtime environment variables; zero hardcoded secrets in git."
+    rationale: "Prevents credential compromise via source code repository exposure."
+    priority: "Must"
+    verification_method: "TruffleHog / GitGuardian static secret scanner"
+    risk: "Critical"
+
+  - id: SEC-015
+    category: "Audit Logging"
+    name: "Security Event Logging"
+    requirement: "Log auth events, authz failures, transaction mutations, and exports in structured JSON."
+    rationale: "Provides forensic audit trails and real-time threat detection."
+    priority: "Must"
+    verification_method: "Audit log stream schema validation test"
+    risk: "High"
+
+  - id: SEC-016
+    category: "Audit Logging"
+    name: "Sensitive Data Log Masking"
+    requirement: "Prohibit plaintext passwords, hashes, and tokens from appearing in log streams."
+    rationale: "Prevents credential harvesting from application log stores (CWE-532)."
+    priority: "Must"
+    verification_method: "Log sanitization audit test"
+    risk: "High"
+
+  - id: SEC-017
+    category: "Availability"
+    name: "Payload and Query Limiting"
+    requirement: "Enforce 1MB max body limit and mandatory query pagination (max 100 records)."
+    rationale: "Guards against memory exhaustion and database query denial of service."
+    priority: "Must"
+    verification_method: "Negative payload boundary test (>1MB)"
+    risk: "Medium"
+
+  - id: SEC-018
+    category: "Resilience"
+    name: "Secure Error Handling"
+    requirement: "Suppress server stack traces in production; emit generic 500 error with tracking ID."
+    rationale: "Eliminates information disclosure (CWE-209)."
+    priority: "Must"
+    verification_method: "Fault injection test provoking internal error"
+    risk: "Medium"
