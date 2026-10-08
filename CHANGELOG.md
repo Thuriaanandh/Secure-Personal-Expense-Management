@@ -26,6 +26,12 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - 4 automated tests verifying credential redaction, Prometheus/JSON metrics endpoints, counter increment accuracy on security violations, and security response headers.
   - Test suite expanded to 50 passing tests.
 
+### Fixed
+- **Bearer Token Whitespace Resiliency (`src/app/core/dependencies.py`, `src/app/core/security.py`, `src/app/services/auth_service.py`):**
+  - Robustly normalized and stripped whitespace surrounding Bearer tokens in authentication dependencies and signature decoders to ensure portable RFC 6750 compliance across all client implementations.
+- **CI Manifest Validation Compatibility (`.github/workflows/ci.yml`):**
+  - Used `kubectl kustomize k8s/` for offline manifest rendering and schema validation without requiring an active control plane endpoint in CI runners.
+
 ## [1.3.0] - 2026-10-08
 
 ### Added
