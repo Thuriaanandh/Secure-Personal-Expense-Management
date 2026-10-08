@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
@@ -58,3 +58,29 @@ class CategoryRepository:
         self.db.commit()
         self.db.refresh(category)
         return category
+
+    def update_custom(
+        self, category: Category, name: Optional[str], cat_type: Optional[str]
+    ) -> Category:
+        if name is not None:
+            category.name = name
+        if cat_type is not None:
+            category.type = cat_type
+        self.db.commit()
+        self.db.refresh(category)
+        return category
+
+    def delete_custom(self, category: Category) -> Tuple[bool, Optional[str]]:
+        from src.app.models.transaction import Transaction
+
+        txn_count = (
+            self.db.query(Transaction).filter(Transaction.category_id == category.id).count()
+        )
+        if txn_count > 0:
+            return (
+                False,
+                "Cannot delete category with associated transactions. Reassign or delete transactions first.",
+            )
+        self.db.delete(category)
+        self.db.commit()
+        return True, None

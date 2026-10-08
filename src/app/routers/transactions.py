@@ -1,3 +1,4 @@
+from datetime import date
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
@@ -50,14 +51,26 @@ def list_transactions(
     keyword: Optional[str] = Query(None, max_length=100, pattern=r"^[a-zA-Z0-9_\-\s]*$"),
     category_id: Optional[int] = Query(None, ge=1),
     type: Optional[str] = Query(None, pattern=r"^(INCOME|EXPENSE)$"),
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
     current_user: User = Depends(get_current_active_user),
     service: TransactionService = Depends(get_transaction_service),
 ):
-    filters = TransactionFilterParams(
-        keyword=keyword, category_id=category_id, type=type, skip=skip, limit=limit
-    )
+    try:
+        filters = TransactionFilterParams(
+            keyword=keyword,
+            category_id=category_id,
+            type=type,
+            start_date=start_date,
+            end_date=end_date,
+            skip=skip,
+            limit=limit,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+
     txns, _ = service.list_transactions(user_id=current_user.id, filters=filters)
     return txns
 
@@ -88,9 +101,11 @@ def update_transaction(
     txn, error = service.update_transaction(
         txn_id=transaction_id, user_id=current_user.id, data=data
     )
-    if error or not txn:
+    if error == "Transaction not found." or (not txn and not error):
         # Uniform 404 on missing or foreign ID
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found.")
+    if error:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
 
     client_ip = request.client.host if request.client else "unknown"
     audit_service.log(

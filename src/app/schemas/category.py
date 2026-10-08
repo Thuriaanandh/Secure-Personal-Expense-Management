@@ -11,6 +11,13 @@ class CategoryCreate(BaseModel):
     model_config = {"extra": "forbid"}
 
 
+class CategoryUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=50, pattern=r"^[a-zA-Z0-9_\-\s]+$")
+    type: Optional[str] = Field(None, pattern=r"^(INCOME|EXPENSE|BOTH)$")
+
+    model_config = {"extra": "forbid"}
+
+
 class CategoryResponse(BaseModel):
     id: int
     user_id: Optional[int] = None

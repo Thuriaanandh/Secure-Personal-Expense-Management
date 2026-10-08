@@ -2,7 +2,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Dict, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class TransactionCreate(BaseModel):
@@ -52,6 +52,15 @@ class TransactionFilterParams(BaseModel):
     limit: int = Field(50, ge=1, le=100)
 
     model_config = {"extra": "forbid"}
+
+    @model_validator(mode="after")
+    def validate_date_range(self) -> "TransactionFilterParams":
+        if self.start_date and self.end_date:
+            if self.start_date > self.end_date:
+                raise ValueError("start_date cannot be later than end_date.")
+            if (self.end_date - self.start_date).days > 1826:
+                raise ValueError("Date range cannot exceed 5 years (SEC-017).")
+        return self
 
 
 class MonthlySummaryResponse(BaseModel):

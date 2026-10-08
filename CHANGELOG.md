@@ -3,6 +3,32 @@
 All notable changes to the **Secure Personal Expense Management Application (SPEMA)** project are documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) and [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.1.0] - 2026-10-08
+
+### Added
+- **Custom Category Lifecycle Management:**
+  - Added `PUT /api/v1/categories/{category_id}` and `DELETE /api/v1/categories/{category_id}` endpoints allowing users to update and delete their custom categories.
+  - Category deletion enforces integrity constraints checking for active transaction dependencies, rejecting deletion with `HTTP 400 Bad Request` if transactions reference the category.
+- **Transaction Temporal Filtering:**
+  - Exposed `start_date` and `end_date` parameters on `GET /api/v1/transactions` with automated database query scoping.
+- **Automated Security Regression Suite:**
+  - `tests/security/test_auth_rate_limit.py`: Tests verifying rate limiter behavior (legitimate user immunity, lockout threshold enforcement, and success reset).
+  - `tests/security/test_transaction_validation.py`: Tests verifying ledger compatibility rules, inverted date rejection, and maximum date span constraints.
+  - `tests/security/test_category_authz.py`: Tests verifying system category immutability, tenant-isolated custom category authorization, and deletion integrity.
+
+### Changed
+- **Authentication Rate Limiter Refactoring (CWE-400 / SEC-003):**
+  - Refactored sliding-window rate limiting in `src/app/routers/auth.py` so only failed authentication attempts increment the failure counter.
+  - Added explicit rate-limit counter reset upon successful credential verification (`reset_rate_limit`), eliminating false-positive Denial-of-Service lockouts for valid users.
+- **Ledger Typology Enforcement (CWE-840 / CWE-285):**
+  - Refactored `TransactionService.create_transaction` and `TransactionService.update_transaction` to validate transaction type against category type (`INCOME`, `EXPENSE`, or `BOTH`). Mismatched classifications are rejected with `HTTP 400 Bad Request`.
+- **Query Parameter Boundary Validation (CWE-20 / SEC-017):**
+  - Enhanced `TransactionFilter` schema with Pydantic `@model_validator` rejecting inverted date windows (`start_date > end_date`) and spans exceeding 5 years (1826 days) to prevent resource exhaustion attacks.
+- **Category Authorization & System Protection (SEC-006 / CWE-285):**
+  - Enforced server-side tenancy scoping on category mutations (`WHERE id = :id AND user_id = :uid`).
+  - System default categories (`is_system = True`) are rendered immutable across all mutation endpoints with `HTTP 403 Forbidden`.
+  - Non-existent or foreign user categories return uniform `HTTP 404 Not Found` to prevent account/ID enumeration.
+
 ## [1.0.0] - 2026-10-08
 
 ### Added

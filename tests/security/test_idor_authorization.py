@@ -36,7 +36,7 @@ def test_cannot_update_other_user_transaction(
         json={
             "amount": 150.00,
             "type": "EXPENSE",
-            "category_id": 1,
+            "category_id": 5,
             "transaction_date": "2026-10-08",
             "description": "User A Legitimate Expense",
         },
@@ -70,7 +70,7 @@ def test_cannot_delete_other_user_transaction(
         json={
             "amount": 300.00,
             "type": "EXPENSE",
-            "category_id": 1,
+            "category_id": 5,
             "transaction_date": "2026-10-08",
             "description": "User A Sensitive Bill",
         },
@@ -98,7 +98,7 @@ def test_cannot_search_or_list_other_user_transactions(
         json={
             "amount": 750.00,
             "type": "EXPENSE",
-            "category_id": 1,
+            "category_id": 5,
             "transaction_date": "2026-10-08",
             "description": "ConfidentialMedicalTreatment",
         },
@@ -147,7 +147,7 @@ def test_reject_client_supplied_user_id(client: TestClient, auth_headers_user_a)
         json={
             "amount": 100.00,
             "type": "EXPENSE",
-            "category_id": 1,
+            "category_id": 5,
             "transaction_date": "2026-10-08",
             "description": "Tamper Attempt",
             "user_id": 9999,

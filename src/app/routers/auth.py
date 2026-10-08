@@ -16,23 +16,32 @@ from src.app.services.auth_service import AuthService
 
 router = APIRouter(prefix="/api/v1/auth", tags=["Authentication"])
 
-# In-memory sliding window rate limiter for login
+# In-memory sliding window rate limiter for failed login attempts
 LOGIN_ATTEMPTS: Dict[str, list] = {}
 
 
 def check_rate_limit(key: str, max_attempts: int, window_seconds: int):
     now = time.time()
     attempts = LOGIN_ATTEMPTS.get(key, [])
-    # Filter attempts within window
+    # Filter attempts within active sliding window
     valid_attempts = [t for t in attempts if now - t < window_seconds]
+    LOGIN_ATTEMPTS[key] = valid_attempts
     if len(valid_attempts) >= max_attempts:
-        LOGIN_ATTEMPTS[key] = valid_attempts
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Too many authentication attempts. Please retry later.",
         )
-    valid_attempts.append(now)
-    LOGIN_ATTEMPTS[key] = valid_attempts
+
+
+def record_failed_attempt(key: str):
+    now = time.time()
+    attempts = LOGIN_ATTEMPTS.get(key, [])
+    attempts.append(now)
+    LOGIN_ATTEMPTS[key] = attempts
+
+
+def reset_rate_limit(key: str):
+    LOGIN_ATTEMPTS.pop(key, None)
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -44,6 +53,7 @@ def register(
 ):
     client_ip = request.client.host if request.client else "unknown"
     check_rate_limit(f"reg_{client_ip}", max_attempts=10, window_seconds=900)
+    record_failed_attempt(f"reg_{client_ip}")
 
     user, error = auth_service.register(
         email=data.email, username=data.username, password=data.password
@@ -91,6 +101,7 @@ def login(
         email_or_username=data.email_or_username, password=data.password
     )
     if error:
+        record_failed_attempt(rate_limit_key)
         audit_service.log(
             event_type="AUTH_FAILURE",
             resource="/api/v1/auth/login",
@@ -104,6 +115,9 @@ def login(
             detail="Invalid credentials.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    # Authentication succeeded: reset failure counter to avoid locking out legitimate users
+    reset_rate_limit(rate_limit_key)
 
     token_dict = auth_service.create_token_for_user(user)
 

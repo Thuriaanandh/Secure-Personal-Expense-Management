@@ -26,6 +26,13 @@ class TransactionService:
         if not category:
             return None, "Invalid category selected or category does not exist."
 
+        # Enforce category type compatibility (CWE-840 / CWE-285)
+        if category.type != "BOTH" and category.type != data.type:
+            return (
+                None,
+                f"Category '{category.name}' (type: {category.type}) is incompatible with transaction type '{data.type}'.",
+            )
+
         txn = self.txn_repo.create(user_id=user_id, data=data)
         return txn, None
 
@@ -36,14 +43,26 @@ class TransactionService:
     def update_transaction(
         self, txn_id: int, user_id: int, data: TransactionUpdate
     ) -> Tuple[Optional[Transaction], Optional[str]]:
-        if data.category_id:
-            category = self.cat_repo.get_by_id(data.category_id, user_id=user_id)
-            if not category:
-                return None, "Invalid category selected."
+        existing_txn = self.txn_repo.get_by_id_and_user(txn_id=txn_id, user_id=user_id)
+        if not existing_txn:
+            return None, "Transaction not found."
+
+        target_cat_id = (
+            data.category_id if data.category_id is not None else existing_txn.category_id
+        )
+        target_type = data.type if data.type is not None else existing_txn.type
+
+        category = self.cat_repo.get_by_id(target_cat_id, user_id=user_id)
+        if not category:
+            return None, "Invalid category selected or category does not exist."
+
+        if category.type != "BOTH" and category.type != target_type:
+            return (
+                None,
+                f"Category '{category.name}' (type: {category.type}) is incompatible with transaction type '{target_type}'.",
+            )
 
         txn = self.txn_repo.update(txn_id=txn_id, user_id=user_id, data=data)
-        if not txn:
-            return None, "Transaction not found."
         return txn, None
 
     def delete_transaction(self, txn_id: int, user_id: int) -> bool:

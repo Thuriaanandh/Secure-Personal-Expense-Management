@@ -40,7 +40,7 @@ def test_csv_export_neutralizes_formula_injection(client: TestClient, auth_heade
         json={
             "amount": 10.00,
             "type": "EXPENSE",
-            "category_id": 1,
+            "category_id": 5,
             "transaction_date": "2026-10-08",
             "description": "=SUM(A1:A100)",
         },
@@ -51,7 +51,7 @@ def test_csv_export_neutralizes_formula_injection(client: TestClient, auth_heade
         json={
             "amount": 20.00,
             "type": "EXPENSE",
-            "category_id": 1,
+            "category_id": 5,
             "transaction_date": "2026-10-08",
             "description": '@HYPERLINK("http://malicious.site")',
         },
