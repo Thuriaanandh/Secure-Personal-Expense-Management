@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" width="1200" height="720">
+<defs>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&amp;family=Inter:wght@300;400;500;600&amp;display=swap');
+    text { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .serif { font-family: 'Newsreader', Georgia, serif; }
+    .mono { font-family: 'SF Mono', Consolas, Monaco, monospace; }
+  </style>
+</defs>
+<rect width="1200" height="720" fill="#FBFBFA" />
+
+<!-- Navigation Bar -->
+<rect x="0" y="0" width="1200" height="70" fill="#FFFFFF" stroke="#EAE8E3" stroke-width="1" />
+<text x="50" y="42" font-size="20" font-weight="600" fill="#242423" class="serif" letter-spacing="0.5">S P E M A</text>
+<text x="145" y="42" font-size="12" fill="#8C8B88" letter-spacing="1">| SECURE EXPENSE</text>
+
+<g font-size="13" font-weight="500" fill="#636361">
+  <text x="450" y="41" fill="#2C4C3B" font-weight="600">Dashboard</text>
+  <line x1="450" y1="52" x2="515" y2="52" stroke="#2C4C3B" stroke-width="2" />
+  <text x="550" y="41">Transactions</text>
+  <text x="660" y="41">Reports</text>
+  <text x="745" y="41">Settings</text>
+</g>
+
+<!-- User & Logout -->
+<circle cx="1060" cy="35" r="16" fill="#EAE8E3" />
+<text x="1053" y="40" font-size="12" font-weight="600" fill="#636361">JD</text>
+<text x="1090" y="40" font-size="13" fill="#636361">Logout</text>
+
+<g transform="translate(50, 95)">
+  <text x="0" y="25" font-size="24" font-weight="600" fill="#242423" class="serif">Transaction History</text>
+  <text x="0" y="45" font-size="12" fill="#636361">Search and filter your personal financial records</text>
+  
+  <!-- Export Trigger -->
+  <rect x="940" y="8" width="160" height="36" rx="4" fill="#FFFFFF" stroke="#2C4C3B" stroke-width="1" />
+  <text x="1020" y="31" font-size="13" font-weight="600" fill="#2C4C3B" text-anchor="middle">&#10515; Export Report</text>
+</g>
+
+<!-- Search Filter Bar -->
+<g transform="translate(50, 165)">
+  <rect x="0" y="0" width="1100" height="70" rx="6" fill="#FFFFFF" stroke="#EAE8E3" stroke-width="1" />
+  
+  <!-- Keyword -->
+  <rect x="20" y="16" width="260" height="38" rx="4" fill="#FBFBFA" stroke="#DCD9D3" stroke-width="1" />
+  <text x="35" y="39" font-size="13" fill="#8C8B88">&#128269; Search description...</text>
+
+  <!-- Category Filter -->
+  <rect x="300" y="16" width="180" height="38" rx="4" fill="#FBFBFA" stroke="#DCD9D3" stroke-width="1" />
+  <text x="315" y="39" font-size="13" fill="#242423">All Categories</text>
+  <polygon points="460,34 466,41 472,34" fill="#636361" />
+
+  <!-- Type Filter -->
+  <rect x="500" y="16" width="140" height="38" rx="4" fill="#FBFBFA" stroke="#DCD9D3" stroke-width="1" />
+  <text x="515" y="39" font-size="13" fill="#242423">All Types</text>
+  <polygon points="620,34 626,41 632,34" fill="#636361" />
+
+  <!-- Date Range -->
+  <rect x="660" y="16" width="180" height="38" rx="4" fill="#FBFBFA" stroke="#DCD9D3" stroke-width="1" />
+  <text x="675" y="39" font-size="12" fill="#242423">2026-10-01 to 10-31</text>
+
+  <!-- Filter Action -->
+  <rect x="860" y="16" width="100" height="38" rx="4" fill="#2C4C3B" />
+  <text x="910" y="39" font-size="13" font-weight="600" fill="#FFFFFF" text-anchor="middle">Filter</text>
+
+  <rect x="975" y="16" width="90" height="38" rx="4" fill="#FFFFFF" stroke="#DCD9D3" stroke-width="1" />
+  <text x="1020" y="39" font-size="13" fill="#636361" text-anchor="middle">Reset</text>
+</g>
+
+<!-- Transaction Table -->
+<g transform="translate(50, 255)">
+  <rect x="0" y="0" width="1100" height="420" rx="6" fill="#FFFFFF" stroke="#EAE8E3" stroke-width="1" />
+  
+  <!-- Header -->
+  <text x="25" y="30" font-size="11" font-weight="600" fill="#8C8B88">DATE</text>
+  <text x="130" y="30" font-size="11" font-weight="600" fill="#8C8B88">TYPE</text>
+  <text x="240" y="30" font-size="11" font-weight="600" fill="#8C8B88">CATEGORY</text>
+  <text x="420" y="30" font-size="11" font-weight="600" fill="#8C8B88">DESCRIPTION</text>
+  <text x="800" y="30" font-size="11" font-weight="600" fill="#8C8B88" text-anchor="end">AMOUNT</text>
+  <text x="1050" y="30" font-size="11" font-weight="600" fill="#8C8B88" text-anchor="end">ACTIONS</text>
+  <line x1="25" y1="45" x2="1075" y2="45" stroke="#EAE8E3" stroke-width="1" />
+
+  <!-- Row 1 -->
+  <text x="25" y="80" font-size="12" fill="#636361">2026-10-07</text>
+  <rect x="130" y="67" width="65" height="20" rx="3" fill="#FDF3E7" />
+  <text x="140" y="81" font-size="11" font-weight="600" fill="#A64B2A">EXPENSE</text>
+  <text x="240" y="80" font-size="12" fill="#242423">Groceries</text>
+  <text x="420" y="80" font-size="12" fill="#242423">Organic Supermarket Fresh Supplies</text>
+  <text x="800" y="80" font-size="13" font-weight="600" fill="#A64B2A" class="mono" text-anchor="end">-$64.20</text>
+  <text x="1010" y="80" font-size="12" fill="#2C4C3B">Edit</text>
+  <text x="1045" y="80" font-size="12" fill="#A64B2A">Delete</text>
+  <line x1="25" y1="100" x2="1075" y2="100" stroke="#F5F4F0" stroke-width="1" />
+
+  <!-- Row 2 -->
+  <text x="25" y="130" font-size="12" fill="#636361">2026-10-05</text>
+  <rect x="130" y="117" width="60" height="20" rx="3" fill="#F4F7F5" />
+  <text x="140" y="131" font-size="11" font-weight="600" fill="#2C4C3B">INCOME</text>
+  <text x="240" y="130" font-size="12" fill="#242423">Salary</text>
+  <text x="420" y="130" font-size="12" fill="#242423">Corporate Monthly Payroll Deposit</text>
+  <text x="800" y="130" font-size="13" font-weight="600" fill="#2C4C3B" class="mono" text-anchor="end">+$5,400.00</text>
+  <text x="1010" y="130" font-size="12" fill="#2C4C3B">Edit</text>
+  <text x="1045" y="130" font-size="12" fill="#A64B2A">Delete</text>
+  <line x1="25" y1="150" x2="1075" y2="150" stroke="#F5F4F0" stroke-width="1" />
+
+  <!-- Row 3 -->
+  <text x="25" y="180" font-size="12" fill="#636361">2026-10-02</text>
+  <rect x="130" y="167" width="65" height="20" rx="3" fill="#FDF3E7" />
+  <text x="140" y="181" font-size="11" font-weight="600" fill="#A64B2A">EXPENSE</text>
+  <text x="240" y="180" font-size="12" fill="#242423">Housing</text>
+  <text x="420" y="180" font-size="12" fill="#242423">Apartment Monthly Lease Payment</text>
+  <text x="800" y="180" font-size="13" font-weight="600" fill="#A64B2A" class="mono" text-anchor="end">-$1,200.00</text>
+  <text x="1010" y="180" font-size="12" fill="#2C4C3B">Edit</text>
+  <text x="1045" y="180" font-size="12" fill="#A64B2A">Delete</text>
+  <line x1="25" y1="200" x2="1075" y2="200" stroke="#F5F4F0" stroke-width="1" />
+
+  <!-- Pagination -->
+  <text x="25" y="380" font-size="12" fill="#8C8B88">Showing 1 to 3 of 42 records (Scoped strictly to current user)</text>
+  <g transform="translate(900, 360)">
+    <rect x="0" y="0" width="30" height="28" rx="3" fill="#2C4C3B" /><text x="11" y="19" font-size="12" fill="#FFFFFF">1</text>
+    <rect x="36" y="0" width="30" height="28" rx="3" fill="#FFFFFF" stroke="#DCD9D3" stroke-width="1" /><text x="47" y="19" font-size="12" fill="#636361">2</text>
+    <rect x="72" y="0" width="30" height="28" rx="3" fill="#FFFFFF" stroke="#DCD9D3" stroke-width="1" /><text x="83" y="19" font-size="12" fill="#636361">&rarr;</text>
+  </g>
+</g>
+
+</svg>
