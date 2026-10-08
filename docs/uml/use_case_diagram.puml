@@ -1,0 +1,91 @@
+@startuml SPEMA_Use_Case_Diagram
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam monochrome false
+
+title Secure Personal Expense Management Application (SPEMA) - UML Use Case Model
+
+actor "Unauthenticated Visitor" as Visitor
+actor "Authenticated User\n(Account Owner)" as User
+actor "System Administrator\n/ Auditor" as Admin
+
+rectangle "Secure Expense Management Boundary" {
+    ' Authentication Core
+    usecase "UC-01: Register Account" as UC_Reg
+    usecase "UC-02: Login" as UC_Login
+    usecase "UC-03: Logout" as UC_Logout
+    usecase "UC-Auth: Verify Session & Extract Identity" as UC_Auth <<include>>
+    usecase "UC-Validate: Validate Financial Input" as UC_Validate <<include>>
+    usecase "UC-Authz: Enforce Tenant Ownership" as UC_Authz <<include>>
+
+    ' Transaction Operations
+    usecase "UC-04: Add Income" as UC_AddIncome
+    usecase "UC-05: Add Expense" as UC_AddExpense
+    usecase "UC-06: Categorize Transaction" as UC_Categorize
+    usecase "UC-07: View Transactions" as UC_ViewTxn
+    usecase "UC-08: Search & Filter Transactions" as UC_SearchTxn
+    usecase "UC-09: Edit Transaction" as UC_EditTxn
+    usecase "UC-10: Delete Transaction" as UC_DeleteTxn
+
+    ' Aggregation & Reporting
+    usecase "UC-11: View Monthly Summary" as UC_MonthlySummary
+    usecase "UC-12: Generate Financial Report" as UC_GenReport
+
+    ' User Profile & Personal Security
+    usecase "UC-13: Manage Account Profile" as UC_Profile
+    usecase "UC-14: View Personal Security Activity" as UC_UserAudit
+
+    ' Operations & System Auditing
+    usecase "UC-15: Monitor System Health" as UC_Health
+    usecase "UC-16: Inspect System Audit Logs" as UC_SysAudit
+}
+
+' Visitor Associations
+Visitor --> UC_Reg
+Visitor --> UC_Login
+
+' User Associations
+User --> UC_Logout
+User --> UC_AddIncome
+User --> UC_AddExpense
+User --> UC_ViewTxn
+User --> UC_EditTxn
+User --> UC_DeleteTxn
+User --> UC_MonthlySummary
+User --> UC_GenReport
+User --> UC_Profile
+User --> UC_UserAudit
+
+' Admin Associations
+Admin --> UC_Health
+Admin --> UC_SysAudit
+
+' <<include>> Relationships (Mandatory Server-Side Auth & Validation)
+UC_AddIncome ..> UC_Auth : <<include>>
+UC_AddExpense ..> UC_Auth : <<include>>
+UC_ViewTxn ..> UC_Auth : <<include>>
+UC_EditTxn ..> UC_Auth : <<include>>
+UC_DeleteTxn ..> UC_Auth : <<include>>
+UC_MonthlySummary ..> UC_Auth : <<include>>
+UC_GenReport ..> UC_Auth : <<include>>
+UC_Profile ..> UC_Auth : <<include>>
+UC_UserAudit ..> UC_Auth : <<include>>
+
+UC_AddIncome ..> UC_Validate : <<include>>
+UC_AddExpense ..> UC_Validate : <<include>>
+UC_EditTxn ..> UC_Validate : <<include>>
+
+UC_EditTxn ..> UC_Authz : <<include>>
+UC_DeleteTxn ..> UC_Authz : <<include>>
+
+' <<extend>> Relationships (Optional or Specialized Extensions)
+UC_Categorize .> UC_AddIncome : <<extend>>
+UC_Categorize .> UC_AddExpense : <<extend>>
+UC_Categorize .> UC_EditTxn : <<extend>>
+
+UC_SearchTxn .> UC_ViewTxn : <<extend>>
+UC_GenReport .> UC_ViewTxn : <<extend>>
+
+@enduml

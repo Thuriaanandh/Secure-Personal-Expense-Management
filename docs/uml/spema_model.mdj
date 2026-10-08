@@ -1,0 +1,179 @@
+{
+  "_type": "Project",
+  "_id": "PROJECT_SPEMA_24CYS401",
+  "name": "Secure Personal Expense Management Application",
+  "ownedElements": [
+    {
+      "_type": "UMLModel",
+      "_id": "MODEL_USE_CASE_01",
+      "name": "Use Case Model",
+      "ownedElements": [
+        {
+          "_type": "UMLActor",
+          "_id": "ACTOR_GUEST",
+          "name": "Unauthenticated Visitor"
+        },
+        {
+          "_type": "UMLActor",
+          "_id": "ACTOR_USER",
+          "name": "Authenticated Account Owner"
+        },
+        {
+          "_type": "UMLActor",
+          "_id": "ACTOR_ADMIN",
+          "name": "System Administrator / Auditor"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_REG",
+          "name": "UC-01: Register Account"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_LOGIN",
+          "name": "UC-02: Login"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_LOGOUT",
+          "name": "UC-03: Logout"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_AUTH",
+          "name": "UC-Auth: Verify Session & Extract Identity (Included)"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_VALIDATE",
+          "name": "UC-Validate: Validate Financial Input Schema (Included)"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_AUTHZ",
+          "name": "UC-Authz: Enforce Tenant Ownership (Included)"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_ADD_INC",
+          "name": "UC-04: Add Income"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_ADD_EXP",
+          "name": "UC-05: Add Expense"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_CATEGORIZE",
+          "name": "UC-06: Categorize Transaction"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_VIEW_TXN",
+          "name": "UC-07: View Transactions"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_SEARCH_TXN",
+          "name": "UC-08: Search & Filter Transactions"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_EDIT_TXN",
+          "name": "UC-09: Edit Transaction"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_DELETE_TXN",
+          "name": "UC-10: Delete Transaction"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_SUMMARY",
+          "name": "UC-11: View Monthly Financial Summary"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_REPORT",
+          "name": "UC-12: Generate Financial Report"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_PROFILE",
+          "name": "UC-13: Manage Account Profile"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_USER_AUDIT",
+          "name": "UC-14: View Personal Security Activity"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_HEALTH",
+          "name": "UC-15: Monitor System Health"
+        },
+        {
+          "_type": "UMLUseCase",
+          "_id": "UC_SYS_AUDIT",
+          "name": "UC-16: Inspect System Audit Logs"
+        }
+      ]
+    },
+    {
+      "_type": "UMLModel",
+      "_id": "MODEL_ANALYSIS_BCE",
+      "name": "Scenario-Based BCE Analysis Model",
+      "ownedElements": [
+        {
+          "_type": "UMLClass",
+          "_id": "BND_UI",
+          "name": "TransactionSearchView (Boundary)",
+          "stereotype": "boundary"
+        },
+        {
+          "_type": "UMLClass",
+          "_id": "BND_API",
+          "name": "TransactionRouterAPI (Boundary)",
+          "stereotype": "boundary"
+        },
+        {
+          "_type": "UMLClass",
+          "_id": "CTRL_AUTH",
+          "name": "AuthenticationInterceptor (Control)",
+          "stereotype": "control"
+        },
+        {
+          "_type": "UMLClass",
+          "_id": "CTRL_QUERY",
+          "name": "TransactionQueryService (Control)",
+          "stereotype": "control"
+        },
+        {
+          "_type": "UMLClass",
+          "_id": "CTRL_AUDIT",
+          "name": "SecurityAuditLogger (Control)",
+          "stereotype": "control"
+        },
+        {
+          "_type": "UMLClass",
+          "_id": "ENT_TOKEN",
+          "name": "UserSessionToken (Entity)",
+          "stereotype": "entity"
+        },
+        {
+          "_type": "UMLClass",
+          "_id": "ENT_TXN",
+          "name": "TransactionEntity (Entity)",
+          "stereotype": "entity"
+        },
+        {
+          "_type": "UMLClass",
+          "_id": "ENT_LOG",
+          "name": "AuditLogEntry (Entity)",
+          "stereotype": "entity"
+        }
+      ]
+    }
+  ]
+}

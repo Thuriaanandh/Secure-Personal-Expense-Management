@@ -1,0 +1,47 @@
+@startuml Scenario_Analysis_Robustness
+skinparam defaultFontName Arial
+skinparam roundcorner 8
+skinparam shadowing false
+
+title Scenario Analysis Model (BCE): "Authenticated User Searches and Views Their Transactions"
+
+actor "Authenticated User\n(Account Owner)" as User
+
+boundary "Dashboard UI\n[TransactionSearchView]" as UI
+boundary "REST API Endpoint\n[/api/v1/transactions]" as API
+
+control "Authentication Interceptor\n[Token & Identity Verifier]" as AuthCtrl
+control "Transaction Query Controller\n[Tenancy Scoping & Query Builder]" as QueryCtrl
+control "Audit Logger\n[Security Event Recorder]" as AuditCtrl
+
+entity "Cryptographic Token\n[UserSessionToken]" as TokenEntity
+entity "Transaction Store\n[TransactionEntity]" as TxnEntity
+entity "Audit Log Store\n[AuditLogEntry]" as LogEntity
+
+' User initiates search
+User -> UI : 1. Submits search criteria\n(keyword, date range, category)
+UI -> API : 2. HTTPS GET /transactions?keyword=...&start_date=...\n[Header: Authorization Bearer <token>]
+
+' Boundary delegates to Authentication Control
+API -> AuthCtrl : 3. Verify token and claims
+AuthCtrl -> TokenEntity : 4. Validate signature & expiration
+TokenEntity --> AuthCtrl : 5. Claims valid, subject: user_id=U_101
+
+' Control enforces server-side tenancy scoping
+AuthCtrl --> API : 6. Identity confirmed (current_user.id = U_101)
+API -> QueryCtrl : 7. Execute search(criteria, user_id=U_101)
+
+' Query Control queries Entity strictly within tenant partition
+QueryCtrl -> TxnEntity : 8. Parameterized query:\nSELECT * FROM transactions\nWHERE user_id = :current_user_id\nAND description ILIKE :keyword ...
+TxnEntity --> QueryCtrl : 9. Returns matching records belonging solely to U_101
+
+' Security audit logging
+QueryCtrl -> AuditCtrl : 10. Record search event\n(user_id=U_101, record_count=N)
+AuditCtrl -> LogEntity : 11. Write immutable audit log
+
+' Return to user
+QueryCtrl --> API : 12. Transaction dataset (JSON)
+API --> UI : 13. HTTP 200 OK + Paginated Transaction list
+UI --> User : 14. Renders filtered transactions securely
+
+@enduml
