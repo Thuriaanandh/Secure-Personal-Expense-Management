@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Reports — SPEMA{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+  <div>
+    <h1 style="font-size: 2rem; margin-bottom: 0.25rem;">Financial Reports &amp; Statements</h1>
+    <p style="font-size: 0.85rem; color: var(--text-muted);">Export verified personal ledger statements for tax records or personal auditing</p>
+  </div>
+  <div>
+    <span class="mono" style="font-size: 0.8rem; background: var(--accent-pine-light); color: var(--accent-pine); padding: 0.35rem 0.75rem; border-radius: 4px; border: 1px solid #D2E0D8;">
+      &#128274; Client Scope: Strictly Isolated Tenancy
+    </span>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem;">
+  <!-- Left: Export Configuration Form -->
+  <div class="card">
+    <h2 style="font-size: 1.35rem; margin-bottom: 1.5rem;">Export Parameters</h2>
+    
+    <form id="reportForm" onsubmit="handleExport(event)">
+      <!-- Period Range Selection -->
+      <div class="form-group">
+        <label class="form-label">Period Quick Selection</label>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 0.75rem;">
+          <button type="button" class="btn btn-outline" style="font-size: 0.75rem; padding: 0.4rem;" onclick="setPeriod('this_month')">This Month</button>
+          <button type="button" class="btn btn-outline" style="font-size: 0.75rem; padding: 0.4rem;" onclick="setPeriod('last_3m')">Last 3 Mo</button>
+          <button type="button" class="btn btn-outline" style="font-size: 0.75rem; padding: 0.4rem;" onclick="setPeriod('ytd')">Year to Date</button>
+          <button type="button" class="btn btn-outline" style="font-size: 0.75rem; padding: 0.4rem;" onclick="setPeriod('all')">All Time</button>
+        </div>
+      </div>
+
+      <!-- Date Range Inputs -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;" class="form-group">
+        <div>
+          <label class="form-label">Start Date</label>
+          <input type="date" id="startDate" name="start_date" class="form-input">
+        </div>
+        <div>
+          <label class="form-label">End Date</label>
+          <input type="date" id="endDate" name="end_date" class="form-input">
+        </div>
+      </div>
+
+      <!-- Transaction Type -->
+      <div class="form-group">
+        <label class="form-label">Transaction Type</label>
+        <select id="txnType" name="type" class="form-select">
+          <option value="">All Transactions (Income &amp; Expenses)</option>
+          <option value="INCOME">Income Only</option>
+          <option value="EXPENSE">Expense Only</option>
+        </select>
+      </div>
+
+      <!-- Category Filter -->
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select id="categoryId" name="category_id" class="form-select">
+          <option value="">All Categories</option>
+          {% for c in categories %}
+            <option value="{{ c.id }}">{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Export Format Selector -->
+      <div class="form-group">
+        <label class="form-label">Export Format</label>
+        <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; cursor: pointer;">
+            <input type="radio" name="format" value="csv" checked>
+            <span><strong>CSV</strong> (Spreadsheet with Formula Neutralization)</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; cursor: pointer;">
+            <input type="radio" name="format" value="json">
+            <span><strong>JSON</strong> (Structured API Export)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Security Notice -->
+      <div style="background: var(--accent-pine-light); border: 1px solid #D2E0D8; border-radius: 4px; padding: 0.85rem; font-size: 0.75rem; color: var(--accent-pine); margin: 1.5rem 0;">
+        <strong>Formula Injection Immunity (CWE-1236 &amp; SEC-011):</strong>
+        <p style="margin-top: 0.25rem; line-height: 1.4;">
+          All exported cell contents beginning with <code>=</code>, <code>+</code>, <code>-</code>, or <code>@</code> are automatically prepended with a single quote (<code>'</code>) to prevent formula execution in spreadsheet software.
+        </p>
+      </div>
+
+      <button type="submit" id="exportBtn" class="btn btn-pine" style="width: 100%; padding: 0.75rem;">
+        &#128190; Download Financial Report
+      </button>
+    </form>
+  </div>
+
+  <!-- Right: Informational Guidelines & Audit Guarantee -->
+  <div>
+    <div class="card" style="margin-bottom: 1.5rem;">
+      <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem;">Security &amp; Confidentiality Guarantee</h3>
+      <ul style="font-size: 0.825rem; color: var(--text-muted); line-height: 1.6; padding-left: 1.25rem;">
+        <li><strong>Server-Enforced Ownership:</strong> Reports are compiled using your verified authenticated session token. No other user's ledger rows can be included.</li>
+        <li><strong>No Ephemeral File Storage:</strong> Reports are streamed dynamically from system memory directly to your browser without persisting unencrypted temporary files on disk.</li>
+        <li><strong>Immutable Security Audit:</strong> Every export action records an immutable audit log entry capturing timestamp, scope, and requesting IP address.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem;">Export Instructions</h3>
+      <p style="font-size: 0.825rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0.75rem;">
+        Downloaded CSV statements can be directly imported into Microsoft Excel, Apple Numbers, or LibreOffice Calc.
+      </p>
+      <p style="font-size: 0.825rem; color: var(--text-muted); line-height: 1.5;">
+        For programmatic ingestion or personal backups, select JSON format to receive RFC 8259 compliant records.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function setPeriod(type) {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+
+    const startInput = document.getElementById('startDate');
+    const endInput = document.getElementById('endDate');
+
+    if (type === 'this_month') {
+      startInput.value = `${yyyy}-${mm}-01`;
+      endInput.value = `${yyyy}-${mm}-${dd}`;
+    } else if (type === 'last_3m') {
+      const d = new Date();
+      d.setMonth(d.getMonth() - 3);
+      startInput.value = d.toISOString().split('T')[0];
+      endInput.value = `${yyyy}-${mm}-${dd}`;
+    } else if (type === 'ytd') {
+      startInput.value = `${yyyy}-01-01`;
+      endInput.value = `${yyyy}-${mm}-${dd}`;
+    } else if (type === 'all') {
+      startInput.value = '';
+      endInput.value = '';
+    }
+  }
+
+  function handleExport(e) {
+    e.preventDefault();
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const type = document.getElementById('txnType').value;
+    const categoryId = document.getElementById('categoryId').value;
+    const format = document.querySelector('input[name="format"]:checked').value;
+
+    const params = new URLSearchParams();
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    if (type) params.append('type', type);
+    if (categoryId) params.append('category_id', categoryId);
+
+    const endpoint = format === 'json' ? '/api/v1/reports/export-json' : '/api/v1/reports/export-csv';
+    const downloadUrl = `${endpoint}?${params.toString()}`;
+
+    window.location.href = downloadUrl;
+  }
+</script>
+{% endblock %}

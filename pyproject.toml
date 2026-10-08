@@ -1,0 +1,43 @@
+[project]
+name = "secure-personal-expense-management"
+version = "1.0.0"
+description = "Secure Personal Expense Management Application for Secure Software Engineering Laboratory"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Thuriaanandh", email = "thuriaanandh@example.com" }
+]
+classifiers = [
+    "Security :: Security Audit",
+    "Framework :: FastAPI",
+    "Topic :: Office/Business :: Financial :: Accounting",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "venv",
+    "build",
+    "dist"
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "C90", "I", "N", "S", "B", "A", "C4", "T20"]
+ignore = ["S101", "S104", "S105", "S106", "B008", "A002", "E501"]  # S101 is assert in tests; B008 is FastAPI Depends
+
+[tool.bandit]
+exclude_dirs = ["tests", "venv", ".venv"]
+skips = ["B101"]  # skip assert warnings for non-prod
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+pythonpath = ["."]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --strict-markers"

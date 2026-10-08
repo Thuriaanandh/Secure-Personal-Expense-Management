@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — SPEMA</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+    :root {
+      --bg: #FBFBFA;
+      --card: #FFFFFF;
+      --text: #242423;
+      --muted: #636361;
+      --border: #EAE8E3;
+      --pine: #2C4C3B;
+      --pine-bg: #F4F7F5;
+      --terracotta: #A64B2A;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+    .auth-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .brand-title {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 0.35rem;
+    }
+    .brand-subtitle {
+      font-size: 0.825rem;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .form-group { margin-bottom: 1.25rem; }
+    label { display: block; font-size: 0.8rem; font-weight: 500; margin-bottom: 0.4rem; }
+    input {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid #DCD9D3;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+    }
+    input:focus { outline: none; border-color: var(--pine); }
+    .badge {
+      background: var(--pine-bg);
+      border: 1px solid #D2E0D8;
+      border-radius: 4px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+      color: var(--pine);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn {
+      width: 100%;
+      background: var(--pine);
+      color: #FFF;
+      border: none;
+      border-radius: 4px;
+      padding: 0.75rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn:hover { background: #233e30; }
+    .footer-links {
+      text-align: center;
+      margin-top: 1.75rem;
+      font-size: 0.825rem;
+      color: var(--muted);
+    }
+    .footer-links a { color: var(--pine); text-decoration: none; font-weight: 600; }
+    .error-box {
+      background: #FDF3E7;
+      border: 1px solid #F5D3C5;
+      color: var(--terracotta);
+      padding: 0.6rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin-bottom: 1.25rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-card">
+    <h1 class="brand-title">Welcome Back</h1>
+    <p class="brand-subtitle">Access your private personal expense ledger</p>
+
+    <div id="errorBox" class="error-box"></div>
+
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label for="identifier">Email Address or Username</label>
+        <input type="text" id="identifier" name="identifier" required placeholder="user@domain.com">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
+      </div>
+
+      <div class="badge">
+        <span>&#128274;</span>
+        <span>Protected by Argon2id &amp; Server-Side Rate Limiter</span>
+      </div>
+
+      <button type="submit" class="btn" id="submitBtn">Sign In to Account</button>
+    </form>
+
+    <div class="footer-links">
+      <p>Don't have an account? <a href="/register">Register securely</a></p>
+      <p style="margin-top: 0.75rem; font-size: 0.75rem; color: #8C8B88;">Zero-Trust Single Tenant Isolation Enforced</p>
+    </div>
+  </div>
+
+  <script>
+    async function handleLogin(e) {
+      e.preventDefault();
+      const errBox = document.getElementById('errorBox');
+      const submitBtn = document.getElementById('submitBtn');
+      errBox.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Verifying...';
+
+      const payload = {
+        email_or_username: document.getElementById('identifier').value,
+        password: document.getElementById('password').value
+      };
+
+      try {
+        const resp = await fetch('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+          // Store token in session storage as fallback
+          sessionStorage.setItem('access_token', data.access_token);
+          window.location.href = '/dashboard';
+        } else {
+          errBox.innerText = data.detail || 'Invalid email or password.';
+          errBox.style.display = 'block';
+        }
+      } catch (err) {
+        errBox.innerText = 'Network error. Please try again.';
+        errBox.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Sign In to Account';
+      }
+    }
+  </script>
+</body>
+</html>

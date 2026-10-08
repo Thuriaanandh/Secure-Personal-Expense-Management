@@ -61,3 +61,10 @@ Desktop.ini
 *.tmp
 temp/
 extracted_instructions.txt
+
+# Local Archives & Helper Scripts
+Claude/
+Claude.zip
+read_docx_com.ps1
+*.docx
+*.db

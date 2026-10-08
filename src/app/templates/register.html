@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — SPEMA</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+    :root {
+      --bg: #FBFBFA;
+      --card: #FFFFFF;
+      --text: #242423;
+      --muted: #636361;
+      --border: #EAE8E3;
+      --pine: #2C4C3B;
+      --terracotta: #A64B2A;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+    .auth-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .brand-title {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 0.35rem;
+    }
+    .brand-subtitle {
+      font-size: 0.825rem;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+    .form-group { margin-bottom: 1.15rem; }
+    label { display: block; font-size: 0.8rem; font-weight: 500; margin-bottom: 0.35rem; }
+    input {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid #DCD9D3;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      background: var(--bg);
+    }
+    input:focus { outline: none; border-color: var(--pine); }
+    .policy-grid {
+      display: flex;
+      gap: 0.75rem;
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .policy-item { display: flex; align-items: center; gap: 0.25rem; }
+    .btn {
+      width: 100%;
+      background: var(--pine);
+      color: #FFF;
+      border: none;
+      border-radius: 4px;
+      padding: 0.75rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn:hover { background: #233e30; }
+    .footer-links { text-align: center; margin-top: 1.5rem; font-size: 0.825rem; color: var(--muted); }
+    .footer-links a { color: var(--pine); text-decoration: none; font-weight: 600; }
+    .error-box {
+      background: #FDF3E7;
+      border: 1px solid #F5D3C5;
+      color: var(--terracotta);
+      padding: 0.6rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin-bottom: 1.25rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-card">
+    <h1 class="brand-title">Create Private Ledger</h1>
+    <p class="brand-subtitle">Your financial records are strictly isolated</p>
+
+    <div id="errorBox" class="error-box"></div>
+
+    <form id="regForm" onsubmit="handleRegister(event)">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" required placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" required minlength="3" maxlength="50" placeholder="finance_user">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" required minlength="10" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
+      </div>
+
+      <div class="policy-grid">
+        <span class="policy-item">&#10003; 10+ Characters</span>
+        <span class="policy-item">&#10003; Upper &amp; Lower</span>
+        <span class="policy-item">&#10003; Digit &amp; Symbol</span>
+      </div>
+
+      <button type="submit" class="btn" id="regBtn">Create Isolated Account</button>
+    </form>
+
+    <div class="footer-links">
+      <p>Already registered? <a href="/login">Sign in here</a></p>
+    </div>
+  </div>
+
+  <script>
+    async function handleRegister(e) {
+      e.preventDefault();
+      const errBox = document.getElementById('errorBox');
+      const regBtn = document.getElementById('regBtn');
+      errBox.style.display = 'none';
+      regBtn.disabled = true;
+      regBtn.innerText = 'Creating account...';
+
+      const payload = {
+        email: document.getElementById('email').value,
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value
+      };
+
+      try {
+        const resp = await fetch('/api/v1/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+          alert('Account created successfully! Please sign in.');
+          window.location.href = '/login';
+        } else {
+          errBox.innerText = data.detail || 'Registration failed.';
+          errBox.style.display = 'block';
+        }
+      } catch (err) {
+        errBox.innerText = 'Network error. Please try again.';
+        errBox.style.display = 'block';
+      } finally {
+        regBtn.disabled = false;
+        regBtn.innerText = 'Create Isolated Account';
+      }
+    }
+  </script>
+</body>
+</html>

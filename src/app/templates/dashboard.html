@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — SPEMA{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+  <div>
+    <h1 style="font-size: 2rem; margin-bottom: 0.25rem;">{{ summary.year }}-{{ "%02d"|format(summary.month) }} Overview</h1>
+    <p style="font-size: 0.85rem; color: var(--text-muted);">Personal financial summary scoped strictly to your account</p>
+  </div>
+  <div style="display: flex; gap: 0.75rem;">
+    <a href="/transactions" class="btn btn-pine">+ Add Transaction</a>
+  </div>
+</div>
+
+<!-- Three Key Stat Cards -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+  <div class="card">
+    <span style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; color: var(--text-muted);">TOTAL INCOME</span>
+    <h2 class="mono" style="font-size: 2rem; color: var(--accent-pine); margin: 0.5rem 0;">+${{ "%.2f"|format(summary.total_income) }}</h2>
+    <span style="font-size: 0.75rem; color: var(--text-subtle);">Direct deposits and earnings</span>
+  </div>
+
+  <div class="card">
+    <span style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; color: var(--text-muted);">TOTAL EXPENSES</span>
+    <h2 class="mono" style="font-size: 2rem; color: var(--accent-terracotta); margin: 0.5rem 0;">-${{ "%.2f"|format(summary.total_expenses) }}</h2>
+    <span style="font-size: 0.75rem; color: var(--text-subtle);">{{ summary.transaction_count }} transactions logged</span>
+  </div>
+
+  <div class="card">
+    <span style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; color: var(--text-muted);">NET CASH BALANCE</span>
+    <h2 class="mono" style="font-size: 2rem; color: var(--text-main); margin: 0.5rem 0;">
+      {% if summary.net_savings >= 0 %}+{% endif %}${{ "%.2f"|format(summary.net_savings) }}
+    </h2>
+    <span style="font-size: 0.75rem; color: {% if summary.net_savings >= 0 %}var(--accent-pine){% else %}var(--accent-terracotta){% endif %};">
+      {% if summary.net_savings >= 0 %}Surplus balance{% else %}Deficit state{% endif %}
+    </span>
+  </div>
+</div>
+
+<!-- Category Breakdown & Recent Activity -->
+<div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 1.5rem;">
+  <!-- Left: Category Spending -->
+  <div class="card">
+    <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem;">Spending by Category</h3>
+    {% if summary.category_breakdown %}
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        {% for cat_name, cat_amount in summary.category_breakdown.items() %}
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem;">
+              <span>{{ cat_name }}</span>
+              <span class="mono">${{ "%.2f"|format(cat_amount) }}</span>
+            </div>
+            <div style="height: 6px; background: #F0EFEA; border-radius: 3px; overflow: hidden;">
+              {% set pct = (cat_amount / summary.total_expenses * 100) if summary.total_expenses > 0 else 0 %}
+              <div style="width: {{ pct }}%; height: 100%; background: var(--accent-pine);"></div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="font-size: 0.85rem; color: var(--text-subtle); padding: 2rem 0; text-align: center;">No expenses recorded for this month.</p>
+    {% endif %}
+  </div>
+
+  <!-- Right: Recent Activity -->
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <h3 style="font-size: 1.25rem;">Recent Activity</h3>
+      <a href="/transactions" style="font-size: 0.8rem; color: var(--accent-pine); text-decoration: none; font-weight: 500;">View All &rarr;</a>
+    </div>
+
+    {% if recent_transactions %}
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        {% for t in recent_transactions %}
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid #F5F4F0;">
+            <div>
+              <div style="font-size: 0.875rem; font-weight: 500;">{{ t.category.name if t.category else 'General' }}</div>
+              <div style="font-size: 0.75rem; color: var(--text-subtle);">{{ t.transaction_date }} &bull; {{ t.description or 'No note' }}</div>
+            </div>
+            <div class="mono" style="font-weight: 600; font-size: 0.95rem; color: {% if t.type == 'INCOME' %}var(--accent-pine){% else %}var(--accent-terracotta){% endif %};">
+              {% if t.type == 'INCOME' %}+{% else %}-{% endif %}${{ "%.2f"|format(t.amount) }}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="font-size: 0.85rem; color: var(--text-subtle); padding: 2rem 0; text-align: center;">No transactions found. Record your first transaction to begin.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

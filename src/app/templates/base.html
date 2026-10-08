@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SPEMA — Secure Personal Expense Management{% endblock %}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    
+    :root {
+      --bg-canvas: #FBFBFA;
+      --surface-card: #FFFFFF;
+      --text-main: #242423;
+      --text-muted: #636361;
+      --text-subtle: #8C8B88;
+      --border-color: #EAE8E3;
+      --accent-pine: #2C4C3B;
+      --accent-pine-light: #F4F7F5;
+      --accent-terracotta: #A64B2A;
+      --accent-terracotta-light: #FDF3E7;
+      --font-serif: 'Newsreader', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .navbar {
+      background: var(--surface-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.85rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--text-main);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .brand-tag {
+      font-family: var(--font-sans);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--text-subtle);
+      font-weight: 500;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+    }
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.15s ease;
+      position: relative;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: var(--accent-pine);
+    }
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent-pine);
+    }
+
+    .container {
+      max-width: 1140px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    .card {
+      background: var(--surface-card);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 1.75rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    h1, h2, h3 {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem 1.25rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+    }
+    .btn-pine {
+      background: var(--accent-pine);
+      color: #FFFFFF;
+    }
+    .btn-pine:hover { background: #233e30; }
+    .btn-outline {
+      background: transparent;
+      border-color: #DCD9D3;
+      color: var(--text-muted);
+    }
+    .btn-outline:hover { border-color: var(--text-main); color: var(--text-main); }
+    .btn-danger {
+      background: var(--accent-terracotta-light);
+      color: var(--accent-terracotta);
+      border-color: #F5D3C5;
+    }
+    .btn-danger:hover { background: #fce8df; }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+      color: var(--text-main);
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 0.6rem 0.85rem;
+      border: 1px solid #DCD9D3;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      background: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+    }
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--accent-pine);
+      box-shadow: 0 0 0 2px rgba(44, 76, 59, 0.12);
+    }
+
+    .badge-income {
+      background: var(--accent-pine-light);
+      color: var(--accent-pine);
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-expense {
+      background: var(--accent-terracotta-light);
+      color: var(--accent-terracotta);
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding: 1.25rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-subtle);
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/dashboard" class="brand">
+      S P E M A <span class="brand-tag">| SECURE LEDGER</span>
+    </a>
+    <div class="nav-links">
+      <a href="/dashboard" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">Dashboard</a>
+      <a href="/transactions" class="nav-link {% if active_page == 'transactions' %}active{% endif %}">Transactions</a>
+      <a href="/reports" class="nav-link {% if active_page == 'reports' %}active{% endif %}">Reports</a>
+      <button onclick="handleLogout()" class="btn btn-outline" style="padding: 0.35rem 0.85rem; font-size: 0.8rem;">Logout</button>
+    </div>
+  </nav>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <p>Secure Personal Expense Management Application &bull; Laboratory Examination Baseline v1.0.0 &bull; Strict Zero-Trust Tenancy Active</p>
+  </footer>
+
+  <script>
+    async function handleLogout() {
+      try {
+        await fetch('/api/v1/auth/logout', { method: 'POST' });
+      } catch (e) {}
+      window.location.href = '/login';
+    }
+  </script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>
