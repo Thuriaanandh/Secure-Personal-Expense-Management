@@ -3,6 +3,29 @@
 All notable changes to the **Secure Personal Expense Management Application (SPEMA)** project are documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) and [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.2.0] - 2026-10-08
+
+### Added
+- **Production-Hardened Containerization:**
+  - Multi-stage Dockerfile based on `python:3.12-slim-bookworm` stripping build utilities from final runtime image.
+  - Dedicated unprivileged non-root user and group `appuser:appgroup` (UID: 10001, GID: 10001, `/sbin/nologin`).
+  - Native Docker container `HEALTHCHECK` periodically probing `/healthz`.
+  - Comprehensive `.dockerignore` preventing leaks of Git history, SQLite databases, credentials, tests, and caches.
+  - Zero baked secrets: all configurations injected dynamically via environment variables and Kubernetes Secrets.
+- **Kubernetes Orchestration & Security Hardening (`k8s/`):**
+  - Dedicated `spema` namespace enforcing Pod Security Standard `restricted` level.
+  - Decoupled `ConfigMap` (`spema-config`) and `Secret` (`spema-secret`) configuration architecture.
+  - `PersistentVolumeClaim` (`spema-data-pvc`, 500Mi) mounted at `/data` for durable database persistence.
+  - Hardened single-replica `Deployment` enforcing `runAsNonRoot: true`, `readOnlyRootFilesystem: true`, `allowPrivilegeEscalation: false`, dropped capabilities (`ALL`), and `RuntimeDefault` seccomp profile.
+  - HTTP liveness (`/healthz`) and readiness (`/readyz`) probes.
+  - NodePort `Service` (`spema-service`) exposing port 8000 on node port 30080.
+  - `NetworkPolicy` (`spema-network-policy`) restricting ingress to port 8000 and limiting egress.
+  - Declarative bundling via `kustomization.yaml`.
+- **Verification & Deployment Documentation:**
+  - End-to-end integration verification test script (`scripts/test_k8s_deployment.py`).
+  - Comprehensive deployment guide (`docs/deployment/docker-kubernetes.md`).
+  - Phase 13 SSDLC phase document (`docs/phases/phase-13-containerization.md`).
+
 ## [1.1.0] - 2026-10-08
 
 ### Added

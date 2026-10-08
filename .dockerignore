@@ -1,0 +1,49 @@
+# Git and Version Control
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# Documentation and Project Management
+docs/
+diagrams/
+Claude/
+Claude.zip
+*.docx
+extracted_instructions.txt
+read_docx_com.ps1
+
+# Test Suite & Development Artifacts
+tests/
+requirements-dev.txt
+bandit.yaml
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local Secrets, Databases, and Environments
+.env
+.env.*
+*.db
+*.sqlite
+*.sqlite3
+spema_ledger.db
+
+# Python Caches & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+env/
+venv/
+ENV/
+
+# Scripts & Temporary Files
+scripts/
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+k8s/
