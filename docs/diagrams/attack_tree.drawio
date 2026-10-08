@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" agent="Antigravity" version="24.0.0">
+  <diagram id="Attack_Tree_Model" name="Attack Tree Model">
+    <mxGraphModel dx="1600" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="root" value="&lt;b&gt;[ROOT GOAL]&lt;/b&gt;&lt;br&gt;Access Another User's Financial Records&lt;br&gt;&lt;i&gt;[OR-Branch]&lt;/i&gt;" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#d32f2f;strokeWidth=3;fontStyle=1;fontSize=13;" vertex="1">
+          <mxGeometry as_="geometry" x="700" y="40" width="360" height="70" />
+        </mxCell>
+        <mxCell id="b1" value="&lt;b&gt;[SUB-GOAL 1: BOLA / IDOR]&lt;/b&gt;&lt;br&gt;Bypass Object-Level Authorization&lt;br&gt;&lt;i&gt;[OR-Branch]&lt;/i&gt;" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe0b2;strokeColor=#f57c00;strokeWidth=2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="80" y="170" width="280" height="70" />
+        </mxCell>
+        <mxCell id="b2" value="&lt;b&gt;[SUB-GOAL 2: SQL INJECTION]&lt;/b&gt;&lt;br&gt;Extract Records via Search SQLi&lt;br&gt;&lt;i&gt;[OR-Branch]&lt;/i&gt;" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe0b2;strokeColor=#f57c00;strokeWidth=2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="480" y="170" width="280" height="70" />
+        </mxCell>
+        <mxCell id="b3" value="&lt;b&gt;[SUB-GOAL 3: AUTH COMPROMISE]&lt;/b&gt;&lt;br&gt;Takeover Account / Session&lt;br&gt;&lt;i&gt;[OR-Branch]&lt;/i&gt;" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe0b2;strokeColor=#f57c00;strokeWidth=2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="880" y="170" width="280" height="70" />
+        </mxCell>
+        <mxCell id="b4" value="&lt;b&gt;[SUB-GOAL 4: REPORT LEAKAGE]&lt;/b&gt;&lt;br&gt;Cross-Tenant Report Exfiltration&lt;br&gt;&lt;i&gt;[OR-Branch]&lt;/i&gt;" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe0b2;strokeColor=#f57c00;strokeWidth=2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="1280" y="170" width="280" height="70" />
+        </mxCell>
+        <mxCell id="e_r_b1" value="" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d32f2f;strokeWidth=2;" edge="1" source="root" target="b1" />
+        <mxCell id="e_r_b2" value="" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d32f2f;strokeWidth=2;" edge="1" source="root" target="b2" />
+        <mxCell id="e_r_b3" value="" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d32f2f;strokeWidth=2;" edge="1" source="root" target="b3" />
+        <mxCell id="e_r_b4" value="" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d32f2f;strokeWidth=2;" edge="1" source="root" target="b4" />
+        <mxCell id="b1_1" value="&lt;b&gt;[PATH 1.1: ID Tampering]&lt;/b&gt;&lt;br&gt;1. Enumerate transaction_id&lt;br&gt;2. Submit GET/PUT with own token&lt;br&gt;&lt;i&gt;[AND-Branch | HIGHEST RISK]&lt;/i&gt;" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#fbc02d;fontStyle=0;fontSize=11;" vertex="1">
+          <mxGeometry as_="geometry" x="40" y="300" width="200" height="80" />
+        </mxCell>
+        <mxCell id="b1_2" value="&lt;b&gt;[PATH 1.2: Tenant Spoofing]&lt;/b&gt;&lt;br&gt;1. Append ?user_id=target&lt;br&gt;2. Client ID overrides token&lt;br&gt;&lt;i&gt;[AND-Branch]&lt;/i&gt;" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#fbc02d;fontStyle=0;fontSize=11;" vertex="1">
+          <mxGeometry as_="geometry" x="260" y="300" width="200" height="80" />
+        </mxCell>
+        <mxCell id="e_b1_1" value="" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#f57c00;" edge="1" source="b1" target="b1_1" />
+        <mxCell id="e_b1_2" value="" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#f57c00;" edge="1" source="b1" target="b1_2" />
+        <mxCell id="def_b1" value="&lt;b&gt;[DEFENSES FOR B1]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Preventive:&lt;/b&gt; Compound DB Query (WHERE id=id AND user_id=uid)&lt;br&gt;&lt;b&gt;Preventive:&lt;/b&gt; Pydantic forbids client user_id&lt;br&gt;&lt;b&gt;Preventive:&lt;/b&gt; Uniform HTTP 404 on cross-tenant lookup&lt;br&gt;&lt;b&gt;Detective:&lt;/b&gt; AuditLogger logs AUTHZ_DENIED" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;strokeWidth=2;fontSize=11;fontColor=#1b5e20;" vertex="1">
+          <mxGeometry as_="geometry" x="40" y="420" width="420" height="90" />
+        </mxCell>
+        <mxCell id="e_def_b1" value="" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;dashed=1;html=1;strokeColor=#2e7d32;" edge="1" source="b1_1" target="def_b1" />
+        <mxCell id="b2_1" value="&lt;b&gt;[PATH 2.1: Tautology Injection]&lt;/b&gt;&lt;br&gt;1. Inject ' OR '1'='1 in keyword&lt;br&gt;2. Bypass WHERE user_id filter&lt;br&gt;&lt;i&gt;[AND-Branch | CRITICAL RISK]&lt;/i&gt;" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#fbc02d;fontStyle=0;fontSize=11;" vertex="1">
+          <mxGeometry as_="geometry" x="480" y="300" width="240" height="80" />
+        </mxCell>
+        <mxCell id="e_b2_1" value="" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#f57c00;" edge="1" source="b2" target="b2_1" />
+        <mxCell id="def_b2" value="&lt;b&gt;[DEFENSES FOR B2]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Preventive:&lt;/b&gt; Parameterized SQLAlchemy 2.0 ORM&lt;br&gt;&lt;b&gt;Preventive:&lt;/b&gt; Whitelist regex validation on keywords&lt;br&gt;&lt;b&gt;Detective:&lt;/b&gt; Database query exception telemetry" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;strokeWidth=2;fontSize=11;fontColor=#1b5e20;" vertex="1">
+          <mxGeometry as_="geometry" x="480" y="420" width="260" height="90" />
+        </mxCell>
+        <mxCell id="e_def_b2" value="" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;dashed=1;html=1;strokeColor=#2e7d32;" edge="1" source="b2_1" target="def_b2" />
+        <mxCell id="b3_1" value="&lt;b&gt;[PATH 3.1: Credential Spraying]&lt;/b&gt;&lt;br&gt;1. Harvest target username&lt;br&gt;2. Script password brute forcing&lt;br&gt;3. Obtain target valid session&lt;br&gt;&lt;i&gt;[AND-Branch]&lt;/i&gt;" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#fbc02d;fontStyle=0;fontSize=11;" vertex="1">
+          <mxGeometry as_="geometry" x="840" y="300" width="200" height="80" />
+        </mxCell>
+        <mxCell id="b3_2" value="&lt;b&gt;[PATH 3.2: JWT Secret Forgery]&lt;/b&gt;&lt;br&gt;1. Crack weak HMAC secret key&lt;br&gt;2. Forge token with sub=target_id&lt;br&gt;&lt;i&gt;[AND-Branch]&lt;/i&gt;" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#fbc02d;fontStyle=0;fontSize=11;" vertex="1">
+          <mxGeometry as_="geometry" x="1060" y="300" width="200" height="80" />
+        </mxCell>
+        <mxCell id="e_b3_1" value="" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#f57c00;" edge="1" source="b3" target="b3_1" />
+        <mxCell id="e_b3_2" value="" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#f57c00;" edge="1" source="b3" target="b3_2" />
+        <mxCell id="def_b3" value="&lt;b&gt;[DEFENSES FOR B3]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Preventive:&lt;/b&gt; Rate Limiter (5 attempts/15 min)&lt;br&gt;&lt;b&gt;Preventive:&lt;/b&gt; Argon2id password hashing&lt;br&gt;&lt;b&gt;Preventive:&lt;/b&gt; 256-bit secret loaded from environment&lt;br&gt;&lt;b&gt;Detective:&lt;/b&gt; Trigger alert on 5 failed logins" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;strokeWidth=2;fontSize=11;fontColor=#1b5e20;" vertex="1">
+          <mxGeometry as_="geometry" x="840" y="420" width="420" height="90" />
+        </mxCell>
+        <mxCell id="e_def_b3" value="" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;dashed=1;html=1;strokeColor=#2e7d32;" edge="1" source="b3_1" target="def_b3" />
+        <mxCell id="b4_1" value="&lt;b&gt;[PATH 4.1: Unscoped Export]&lt;/b&gt;&lt;br&gt;1. Request /reports/export-csv&lt;br&gt;2. Tamper with account query param&lt;br&gt;&lt;i&gt;[AND-Branch]&lt;/i&gt;" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#fbc02d;fontStyle=0;fontSize=11;" vertex="1">
+          <mxGeometry as_="geometry" x="1300" y="300" width="240" height="80" />
+        </mxCell>
+        <mxCell id="e_b4_1" value="" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#f57c00;" edge="1" source="b4" target="b4_1" />
+        <mxCell id="def_b4" value="&lt;b&gt;[DEFENSES FOR B4]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Preventive:&lt;/b&gt; Export query strictly scoped to current_user.id&lt;br&gt;&lt;b&gt;Preventive:&lt;/b&gt; Formula injection sanitized (prepend ')&lt;br&gt;&lt;b&gt;Detective:&lt;/b&gt; AuditLogger logs REPORT_EXPORTED with record count" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;strokeWidth=2;fontSize=11;fontColor=#1b5e20;" vertex="1">
+          <mxGeometry as_="geometry" x="1300" y="420" width="260" height="90" />
+        </mxCell>
+        <mxCell id="e_def_b4" value="" parent="1" style="edgeStyle=orthogonalEdgeStyle;dashed=1;rounded=0;html=1;strokeColor=#2e7d32;" edge="1" source="b4_1" target="def_b4" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
