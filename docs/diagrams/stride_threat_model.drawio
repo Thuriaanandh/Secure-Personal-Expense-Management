@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" agent="Antigravity" version="24.0.0">
+  <diagram id="STRIDE_Threat_Model" name="STRIDE Threat Model">
+    <mxGraphModel dx="1500" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="tb_client" value="TRUST BOUNDARY 1 (TB1): Untrusted Browser &amp; Public Internet" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;strokeColor=#d32f2f;strokeWidth=2;fillColor=#ffebee;verticalAlign=top;fontStyle=1;fontColor=#b71c1c;" vertex="1">
+          <mxGeometry as_="geometry" x="40" y="40" width="360" height="680" />
+        </mxCell>
+        <mxCell id="tb_app" value="TRUST BOUNDARY 2 (TB2): Trusted Application Execution Environment" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;strokeColor=#1976d2;strokeWidth=2;fillColor=#e3f2fd;verticalAlign=top;fontStyle=1;fontColor=#0d47a1;" vertex="1">
+          <mxGeometry as_="geometry" x="460" y="40" width="720" height="680" />
+        </mxCell>
+        <mxCell id="tb_db" value="TRUST BOUNDARY 3 (TB3): Trusted Data Storage Security Perimeter" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;strokeColor=#388e3c;strokeWidth=2;fillColor=#e8f5e9;verticalAlign=top;fontStyle=1;fontColor=#1b5e20;" vertex="1">
+          <mxGeometry as_="geometry" x="1240" y="40" width="360" height="680" />
+        </mxCell>
+        <mxCell id="th1" value="&lt;b&gt;THR-01 [Spoofing]&lt;/b&gt;&lt;br&gt;Credential Stuffing / Brute Force&lt;br&gt;&lt;i&gt;Mitigation: Rate Limiter &amp;amp; Argon2id&lt;/i&gt;" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;fontStyle=0;fontSize=11;" vertex="1">
+          <mxGeometry as_="geometry" x="80" y="100" width="280" height="60" />
+        </mxCell>
+        <mxCell id="th2" value="&lt;b&gt;THR-02 [Spoofing]&lt;/b&gt;&lt;br&gt;JWT Token Forgery / Alg None&lt;br&gt;&lt;i&gt;Mitigation: HS256 Secret &amp;amp; Claim Validation&lt;/i&gt;" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;fontStyle=0;fontSize=11;" vertex="1">
+          <mxGeometry as_="geometry" x="80" y="190" width="280" height="60" />
+        </mxCell>
+        <mxCell id="th10" value="&lt;b&gt;THR-10 [Elevation of Privilege]&lt;/b&gt;&lt;br&gt;Client Parameter Tampering (?user_id=2)&lt;br&gt;&lt;i&gt;Mitigation: Server Strips Client IDs&lt;/i&gt;" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;fontStyle=0;fontSize=11;" vertex="1">
+          <mxGeometry as_="geometry" x="80" y="280" width="280" height="60" />
+        </mxCell>
+        <mxCell id="th9" value="&lt;b&gt;THR-09 [Denial of Service]&lt;/b&gt;&lt;br&gt;Payload Flooding / Large Requests&lt;br&gt;&lt;i&gt;Mitigation: 1MB Body Limit &amp;amp; Pagination&lt;/i&gt;" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;fontStyle=0;fontSize=11;" vertex="1">
+          <mxGeometry as_="geometry" x="80" y="370" width="280" height="60" />
+        </mxCell>
+        <mxCell id="th11" value="&lt;b&gt;THR-11 [Tampering/XSS]&lt;/b&gt;&lt;br&gt;Stored XSS in Notes/Description&lt;br&gt;&lt;i&gt;Mitigation: Context HTML Encoding &amp;amp; CSP&lt;/i&gt;" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;fontStyle=0;fontSize=11;" vertex="1">
+          <mxGeometry as_="geometry" x="80" y="460" width="280" height="60" />
+        </mxCell>
+        <mxCell id="p_auth" value="Process 1.0: Authentication&lt;br&gt;[Argon2id + JWT Manager]" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="500" y="90" width="220" height="80" />
+        </mxCell>
+        <mxCell id="p_gate" value="Process 2.0: Tenancy Gate&lt;br&gt;[Enforces current_user.id]" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;strokeWidth=2;" vertex="1">
+          <mxGeometry as_="geometry" x="500" y="240" width="220" height="80" />
+        </mxCell>
+        <mxCell id="th3" value="&lt;b&gt;THR-03 [Tampering / BOLA]&lt;/b&gt;&lt;br&gt;IDOR on Transaction Update/Delete&lt;br&gt;&lt;i&gt;Mitigation: Compound DB Query (WHERE id=id AND user_id=uid)&lt;/i&gt;" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#fbc02d;fontStyle=0;fontSize=11;" vertex="1">
+          <mxGeometry as_="geometry" x="780" y="240" width="360" height="60" />
+        </mxCell>
+        <mxCell id="p_txn" value="Process 3.0: Transaction Service&lt;br&gt;[CRUD &amp;amp; Search Builder]" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="500" y="380" width="220" height="80" />
+        </mxCell>
+        <mxCell id="th4" value="&lt;b&gt;THR-04 [Tampering / SQLi]&lt;/b&gt;&lt;br&gt;SQL Injection via Search Keywords&lt;br&gt;&lt;i&gt;Mitigation: Parameterized SQLAlchemy ORM&lt;/i&gt;" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#fbc02d;fontStyle=0;fontSize=11;" vertex="1">
+          <mxGeometry as_="geometry" x="780" y="380" width="360" height="60" />
+        </mxCell>
+        <mxCell id="p_rep" value="Process 5.0: Secure Reporting&lt;br&gt;[CSV Exporter]" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="500" y="520" width="220" height="80" />
+        </mxCell>
+        <mxCell id="th5" value="&lt;b&gt;THR-05 [Tampering / Formula]&lt;/b&gt;&lt;br&gt;CSV Formula Injection (CWE-1236)&lt;br&gt;&lt;i&gt;Mitigation: Prepend Single Quote (') to =, +, -, @&lt;/i&gt;" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#fbc02d;fontStyle=0;fontSize=11;" vertex="1">
+          <mxGeometry as_="geometry" x="780" y="520" width="360" height="60" />
+        </mxCell>
+        <mxCell id="d_txn" value="D3: Transaction Ledger&lt;br&gt;[transactions table]" parent="1" style="shape=partialRectangle;top=0;bottom=0;fillColor=#c8e6c9;strokeColor=#2e7d32;fontStyle=1;strokeWidth=2;" vertex="1">
+          <mxGeometry as_="geometry" x="1280" y="240" width="260" height="90" />
+        </mxCell>
+        <mxCell id="th7" value="&lt;b&gt;THR-07 [Info Disclosure]&lt;/b&gt;&lt;br&gt;Transaction ID Enumeration&lt;br&gt;&lt;i&gt;Mitigation: Uniform 404 Not Found&lt;/i&gt;" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#8e24aa;fontStyle=0;fontSize=11;" vertex="1">
+          <mxGeometry as_="geometry" x="1280" y="360" width="260" height="60" />
+        </mxCell>
+        <mxCell id="d_aud" value="D4: Security Audit Store&lt;br&gt;[audit_logs table]" parent="1" style="shape=partialRectangle;top=0;bottom=0;fillColor=#c8e6c9;strokeColor=#2e7d32;fontStyle=1;" vertex="1">
+          <mxGeometry as_="geometry" x="1280" y="480" width="260" height="90" />
+        </mxCell>
+        <mxCell id="th8" value="&lt;b&gt;THR-08 [Info Disclosure]&lt;/b&gt;&lt;br&gt;Credential Leakage in Logs&lt;br&gt;&lt;i&gt;Mitigation: Strict Log Sanitization Masking&lt;/i&gt;" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#8e24aa;fontStyle=0;fontSize=11;" vertex="1">
+          <mxGeometry as_="geometry" x="1280" y="600" width="260" height="60" />
+        </mxCell>
+        <mxCell id="edge1" value="Crosses TB1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d32f2f;strokeWidth=2;" edge="1" source="th1" target="p_auth" />
+        <mxCell id="edge2" value="Identity Propagation" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1976d2;" edge="1" source="p_auth" target="p_gate" />
+        <mxCell id="edge3" value="Enforces uid" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1976d2;" edge="1" source="p_gate" target="p_txn" />
+        <mxCell id="edge4" value="Crosses TB3" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#388e3c;strokeWidth=2;" edge="1" source="p_txn" target="d_txn" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
