@@ -10,6 +10,8 @@ from src.app.core.dependencies import (
     get_reporting_service,
     get_transaction_service,
 )
+from src.app.core.logging import log_security_event
+from src.app.core.metrics import metrics
 from src.app.models.user import User
 from src.app.schemas.transaction import MonthlySummaryResponse, TransactionFilterParams
 from src.app.services.audit_service import AuditService
@@ -64,6 +66,7 @@ def export_csv_report(
     csv_buffer = reporting_service.generate_csv_report(user_id=current_user.id, filters=filters)
 
     client_ip = request.client.host if request.client else "unknown"
+    metrics.record_report_generated()
     audit_service.log(
         event_type="REPORT_EXPORTED",
         resource="/api/v1/reports/export-csv",
@@ -71,6 +74,15 @@ def export_csv_report(
         client_ip=client_ip,
         user_id=current_user.id,
         details={"type": type, "category_id": category_id},
+    )
+    log_security_event(
+        event_type="REPORT_GENERATED",
+        action="EXPORT_CSV",
+        status_code=200,
+        user_id=current_user.id,
+        client_ip=client_ip,
+        resource="/api/v1/reports/export-csv",
+        details={"format": "CSV", "type": type, "category_id": category_id},
     )
 
     filename = f"expense_report_{datetime.now().strftime('%Y%m%d')}.csv"
@@ -109,6 +121,7 @@ def export_json_report(
     data = reporting_service.generate_json_report(user_id=current_user.id, filters=filters)
 
     client_ip = request.client.host if request.client else "unknown"
+    metrics.record_report_generated()
     audit_service.log(
         event_type="REPORT_EXPORTED_JSON",
         resource="/api/v1/reports/export-json",
@@ -116,6 +129,15 @@ def export_json_report(
         client_ip=client_ip,
         user_id=current_user.id,
         details={"type": type, "category_id": category_id},
+    )
+    log_security_event(
+        event_type="REPORT_GENERATED",
+        action="EXPORT_JSON",
+        status_code=200,
+        user_id=current_user.id,
+        client_ip=client_ip,
+        resource="/api/v1/reports/export-json",
+        details={"format": "JSON", "type": type, "category_id": category_id},
     )
 
     return data

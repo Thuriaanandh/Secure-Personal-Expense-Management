@@ -4,9 +4,9 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Secure Personal Expense Management Application"
-    PROJECT_VERSION: str = "1.3.0"
+    PROJECT_VERSION: str = "1.4.0"
     APP_NAME: str = "Secure Personal Expense Management Application"
-    APP_VERSION: str = "1.3.0"
+    APP_VERSION: str = "1.4.0"
     APP_ENV: str = Field(default="development", alias="APP_ENV")
     CORS_ORIGINS: list[str] = ["http://localhost:8000", "http://127.0.0.1:8000"]
 
@@ -25,6 +25,12 @@ class Settings(BaseSettings):
     RATE_LIMIT_LOGIN_MAX_ATTEMPTS: int = 5
     RATE_LIMIT_LOGIN_WINDOW_SECONDS: int = 900  # 15 minutes
 
+    # Security Hardening Flags (Phase 15)
+    SECURE_HSTS_SECONDS: int = Field(default=31536000, alias="SECURE_HSTS_SECONDS")
+    SECURE_HSTS_PRELOAD: bool = Field(default=True, alias="SECURE_HSTS_PRELOAD")
+    SESSION_COOKIE_SECURE: bool = Field(default=False, alias="SESSION_COOKIE_SECURE")
+    ENABLE_PROMETHEUS_METRICS: bool = Field(default=True, alias="ENABLE_PROMETHEUS_METRICS")
+
     model_config = {"env_file": ".env", "extra": "ignore"}
 
 
@@ -35,6 +41,8 @@ def get_settings() -> Settings:
     global _settings
     if _settings is None:
         _settings = Settings()
-        if _settings.APP_ENV == "production" and len(_settings.SECRET_KEY) < 32:
-            raise ValueError("SECRET_KEY must be at least 32 characters long in production.")
+        if _settings.APP_ENV == "production":
+            _settings.SESSION_COOKIE_SECURE = True
+            if len(_settings.SECRET_KEY) < 32:
+                raise ValueError("SECRET_KEY must be at least 32 characters long in production.")
     return _settings

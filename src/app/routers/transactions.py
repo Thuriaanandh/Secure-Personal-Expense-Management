@@ -8,6 +8,8 @@ from src.app.core.dependencies import (
     get_current_active_user,
     get_transaction_service,
 )
+from src.app.core.logging import log_security_event
+from src.app.core.metrics import metrics
 from src.app.models.user import User
 from src.app.schemas.transaction import (
     TransactionCreate,
@@ -35,6 +37,7 @@ def create_transaction(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
 
     client_ip = request.client.host if request.client else "unknown"
+    metrics.record_transaction_created()
     audit_service.log(
         event_type="TXN_CREATED",
         resource="/api/v1/transactions",
@@ -42,6 +45,15 @@ def create_transaction(
         client_ip=client_ip,
         user_id=current_user.id,
         details={"transaction_id": txn.id, "amount": str(txn.amount), "type": txn.type},
+    )
+    log_security_event(
+        event_type="TRANSACTION_CREATED",
+        action="CREATE_TXN",
+        status_code=201,
+        user_id=current_user.id,
+        client_ip=client_ip,
+        resource="/api/v1/transactions",
+        details={"transaction_id": txn.id, "category_id": txn.category_id, "type": txn.type},
     )
     return txn
 
@@ -78,12 +90,25 @@ def list_transactions(
 @router.get("/{transaction_id}", response_model=TransactionResponse)
 def get_transaction(
     transaction_id: int,
+    request: Request,
     current_user: User = Depends(get_current_active_user),
     service: TransactionService = Depends(get_transaction_service),
 ):
     # Compound query lookup
     txn = service.get_transaction(txn_id=transaction_id, user_id=current_user.id)
     if not txn:
+        client_ip = request.client.host if request.client else "unknown"
+        metrics.record_authz_failure()
+        log_security_event(
+            event_type="AUTHZ_FAILURE",
+            action="TRANSACTION_ACCESS_DENIED",
+            status_code=404,
+            user_id=current_user.id,
+            client_ip=client_ip,
+            resource=f"/api/v1/transactions/{transaction_id}",
+            details={"attempted_id": transaction_id, "reason": "IDOR attempt or record missing"},
+            severity="WARNING",
+        )
         # Uniform 404 response eliminates identifier enumeration (SEC-006)
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found.")
     return txn
@@ -102,6 +127,18 @@ def update_transaction(
         txn_id=transaction_id, user_id=current_user.id, data=data
     )
     if error == "Transaction not found." or (not txn and not error):
+        client_ip = request.client.host if request.client else "unknown"
+        metrics.record_authz_failure()
+        log_security_event(
+            event_type="AUTHZ_FAILURE",
+            action="TRANSACTION_UPDATE_DENIED",
+            status_code=404,
+            user_id=current_user.id,
+            client_ip=client_ip,
+            resource=f"/api/v1/transactions/{transaction_id}",
+            details={"attempted_id": transaction_id, "reason": "IDOR attempt or record missing"},
+            severity="WARNING",
+        )
         # Uniform 404 on missing or foreign ID
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found.")
     if error:
@@ -114,6 +151,15 @@ def update_transaction(
         status_code=200,
         client_ip=client_ip,
         user_id=current_user.id,
+        details={"transaction_id": transaction_id},
+    )
+    log_security_event(
+        event_type="TRANSACTION_UPDATED",
+        action="UPDATE_TXN",
+        status_code=200,
+        user_id=current_user.id,
+        client_ip=client_ip,
+        resource=f"/api/v1/transactions/{transaction_id}",
         details={"transaction_id": transaction_id},
     )
     return txn
@@ -129,16 +175,38 @@ def delete_transaction(
 ):
     deleted = service.delete_transaction(txn_id=transaction_id, user_id=current_user.id)
     if not deleted:
+        client_ip = request.client.host if request.client else "unknown"
+        metrics.record_authz_failure()
+        log_security_event(
+            event_type="AUTHZ_FAILURE",
+            action="TRANSACTION_DELETE_DENIED",
+            status_code=404,
+            user_id=current_user.id,
+            client_ip=client_ip,
+            resource=f"/api/v1/transactions/{transaction_id}",
+            details={"attempted_id": transaction_id, "reason": "IDOR attempt or record missing"},
+            severity="WARNING",
+        )
         # Uniform 404 on missing or foreign ID
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found.")
 
     client_ip = request.client.host if request.client else "unknown"
+    metrics.record_transaction_deleted()
     audit_service.log(
         event_type="TXN_DELETED",
         resource=f"/api/v1/transactions/{transaction_id}",
         status_code=200,
         client_ip=client_ip,
         user_id=current_user.id,
+        details={"transaction_id": transaction_id},
+    )
+    log_security_event(
+        event_type="TRANSACTION_DELETED",
+        action="DELETE_TXN",
+        status_code=200,
+        user_id=current_user.id,
+        client_ip=client_ip,
+        resource=f"/api/v1/transactions/{transaction_id}",
         details={"transaction_id": transaction_id},
     )
     return {"detail": "Transaction deleted successfully."}

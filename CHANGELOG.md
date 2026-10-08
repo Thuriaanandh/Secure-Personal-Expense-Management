@@ -3,6 +3,29 @@
 All notable changes to the **Secure Personal Expense Management Application (SPEMA)** project are documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) and [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.4.0] - 2026-10-08
+
+### Added
+- **Structured Security Logging Engine (`src/app/core/logging.py`):**
+  - Standardized JSON security event streaming with ISO-8601 UTC timestamps, severity levels, event types, action codes, correlation IDs, and caller context for SIEM aggregation.
+  - Strict sensitive credential redaction filter (`mask_security_payload`) preventing exposure of passwords, tokens, hashes, and API keys in logs (CWE-532).
+  - In-memory circular audit buffer (`_EVENT_BUFFER`) capturing recent security events with protected retrieval endpoint (`GET /api/v1/audit/recent-events`).
+- **Operational & Security Metrics Engine (`src/app/core/metrics.py` & `src/app/routers/metrics.py`):**
+  - Prometheus exposition endpoint (`GET /metrics`) tracking `spema_app_uptime_seconds`, `spema_auth_successes_total`, `spema_auth_failures_total`, `spema_authz_failures_total`, `spema_rate_limit_exceeded_total`, `spema_transactions_created_total`, `spema_transactions_deleted_total`, `spema_reports_generated_total`, and `spema_server_errors_total`.
+  - JSON operational summary endpoint (`GET /api/v1/metrics`).
+  - Automated `MetricsMiddleware` tracking HTTP request throughput and 5xx failure rates.
+- **Defense-in-Depth Protocol & Runtime Hardening:**
+  - HTTP Strict Transport Security (`Strict-Transport-Security: max-age=31536000; includeSubDomains; preload`).
+  - Cross-Origin Opener Policy (`Cross-Origin-Opener-Policy: same-origin`) and Cross-Origin Resource Policy (`Cross-Origin-Resource-Policy: same-origin`).
+  - End-to-end request tracing via `X-Correlation-ID` header injection on all HTTP responses and error envelopes.
+  - Hardened cookie lifecycle with `SESSION_COOKIE_SECURE` automatically enforced in production environments.
+- **Secure Deployment Checklist & Verification Automation:**
+  - Production readiness checklist (`docs/deployment/secure-deployment-checklist.md`) across 11 architectural domains including disaster recovery and hot-backup procedures.
+  - Automated deployment audit script (`scripts/verify_deployment.py`) asserting all 14 security criteria.
+- **Security Testing Suite Expansion (`tests/security/test_logging_monitoring_hardening.py`):**
+  - 4 automated tests verifying credential redaction, Prometheus/JSON metrics endpoints, counter increment accuracy on security violations, and security response headers.
+  - Test suite expanded to 50 passing tests.
+
 ## [1.3.0] - 2026-10-08
 
 ### Added

@@ -9,6 +9,8 @@ from src.app.core.dependencies import (
     get_auth_service,
     get_current_active_user,
 )
+from src.app.core.logging import log_security_event
+from src.app.core.metrics import metrics
 from src.app.models.user import User
 from src.app.schemas.user import TokenResponse, UserCreate, UserLogin, UserResponse
 from src.app.services.audit_service import AuditService
@@ -27,6 +29,15 @@ def check_rate_limit(key: str, max_attempts: int, window_seconds: int):
     valid_attempts = [t for t in attempts if now - t < window_seconds]
     LOGIN_ATTEMPTS[key] = valid_attempts
     if len(valid_attempts) >= max_attempts:
+        metrics.record_rate_limit_exceeded()
+        log_security_event(
+            event_type="RATE_LIMIT_EXCEEDED",
+            action="RATE_LIMIT_LOCKOUT",
+            status_code=429,
+            resource="/api/v1/auth",
+            details={"rate_limit_key": key, "attempts": len(valid_attempts)},
+            severity="WARNING",
+        )
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Too many authentication attempts. Please retry later.",
@@ -76,6 +87,15 @@ def register(
         user_id=user.id,
         details={"username": user.username},
     )
+    log_security_event(
+        event_type="AUTH_REGISTER",
+        action="USER_REGISTRATION",
+        status_code=201,
+        user_id=user.id,
+        client_ip=client_ip,
+        resource="/api/v1/auth/register",
+        details={"username": user.username},
+    )
     return user
 
 
@@ -102,12 +122,22 @@ def login(
     )
     if error:
         record_failed_attempt(rate_limit_key)
+        metrics.record_auth_failure()
         audit_service.log(
             event_type="AUTH_FAILURE",
             resource="/api/v1/auth/login",
             status_code=401,
             client_ip=client_ip,
             details={"reason": error, "identifier": data.email_or_username},
+        )
+        log_security_event(
+            event_type="AUTH_FAILURE",
+            action="LOGIN_ATTEMPT_FAILED",
+            status_code=401,
+            client_ip=client_ip,
+            resource="/api/v1/auth/login",
+            details={"identifier": data.email_or_username, "reason": error},
+            severity="WARNING",
         )
         # Uniform 401 prevents username enumeration
         raise HTTPException(
@@ -118,6 +148,7 @@ def login(
 
     # Authentication succeeded: reset failure counter to avoid locking out legitimate users
     reset_rate_limit(rate_limit_key)
+    metrics.record_auth_success()
 
     token_dict = auth_service.create_token_for_user(user)
 
@@ -128,7 +159,7 @@ def login(
         max_age=token_dict["expires_in"],
         httponly=True,
         samesite="lax",
-        secure=False,  # Allow localhost in dev/testing; True in production
+        secure=settings.SESSION_COOKIE_SECURE,
     )
 
     audit_service.log(
@@ -137,6 +168,15 @@ def login(
         status_code=200,
         client_ip=client_ip,
         user_id=user.id,
+    )
+    log_security_event(
+        event_type="AUTH_SUCCESS",
+        action="LOGIN_SUCCESS",
+        status_code=200,
+        user_id=user.id,
+        client_ip=client_ip,
+        resource="/api/v1/auth/login",
+        details={"username": user.username},
     )
     return token_dict
 
@@ -172,6 +212,14 @@ def logout(
         status_code=200,
         client_ip=client_ip,
         user_id=current_user.id,
+    )
+    log_security_event(
+        event_type="AUTH_LOGOUT",
+        action="USER_LOGOUT",
+        status_code=200,
+        user_id=current_user.id,
+        client_ip=client_ip,
+        resource="/api/v1/auth/logout",
     )
     return {"detail": "Logged out successfully."}
 
